@@ -1,0 +1,422 @@
+{
+  "users": [
+    {
+      "id": "admin-1",
+      "name": "Dr. Sarah Mitchell",
+      "email": "admin@eduarchive.ac.in",
+      "password_hash": "$2a$10$vPZ5U4TmsZ4C8HhP3f6hAejZ65q6H9Y92hG9S/eX10f3UvF8B6bT2",
+      "role": "admin",
+      "created_at": "2026-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "student-1",
+      "name": "Rohan Sharma",
+      "email": "student@eduarchive.ac.in",
+      "password_hash": "$2a$10$vPZ5U4TmsZ4C8HhP3f6hAejZ65q6H9Y92hG9S/eX10f3UvF8B6bT2",
+      "role": "student",
+      "created_at": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "name": "Riya Umekar",
+      "email": "umekarriya9359@gmail.com",
+      "password_hash": "$2b$10$CmL4K6mNwh4FtskexGXmUejwDdKr6jxFJqj0qwE98wjgWbicgtF1.",
+      "role": "student",
+      "id": "usr-j0qn7ssml",
+      "created_at": "2026-06-26T17:03:08.999Z"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "sub-dbms",
+      "name": "Database Management Systems",
+      "code": "CS-501",
+      "semester": 5,
+      "branch": "Computer Science & Engineering",
+      "description": "Covers relational algebra, SQL, normalization, index structures, concurrency control, and transactional processing.",
+      "created_at": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "id": "sub-cn",
+      "name": "Computer Networks",
+      "code": "CS-502",
+      "semester": 5,
+      "branch": "Computer Science & Engineering",
+      "description": "Study of network architecture, OSI and TCP/IP protocol suites, congestion control, routing protocols, and security.",
+      "created_at": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "id": "sub-os",
+      "name": "Operating Systems",
+      "code": "CS-503",
+      "semester": 5,
+      "branch": "Computer Science & Engineering",
+      "description": "Explores process management, thread synchronization, memory management, file systems, disk scheduling, and I/O.",
+      "created_at": "2026-03-03T00:00:00.000Z"
+    }
+  ],
+  "units": [
+    {
+      "id": "unit-dbms-1",
+      "subject_id": "sub-dbms",
+      "unit_number": 1,
+      "unit_name": "Introduction & ER Model",
+      "description": "Database system architecture, data models, ER diagrams, constraints, and design issues."
+    },
+    {
+      "id": "unit-dbms-2",
+      "subject_id": "sub-dbms",
+      "unit_number": 2,
+      "unit_name": "Relational Model & SQL",
+      "description": "Relational algebra, SQL DDL/DML, joins, subqueries, integrity constraints, and views."
+    },
+    {
+      "id": "unit-dbms-3",
+      "subject_id": "sub-dbms",
+      "unit_number": 3,
+      "unit_name": "Database Design & Normalization",
+      "description": "Functional dependencies, 1NF, 2NF, 3NF, BCNF, multi-valued dependencies, and indexing mechanisms."
+    },
+    {
+      "id": "unit-dbms-4",
+      "subject_id": "sub-dbms",
+      "unit_number": 4,
+      "unit_name": "Transaction & Concurrency Control",
+      "description": "ACID properties, states, schedules, serializability, lock-based protocols, and timestamping."
+    },
+    {
+      "id": "unit-dbms-5",
+      "subject_id": "sub-dbms",
+      "unit_number": 5,
+      "unit_name": "Crash Recovery & Modern Systems",
+      "description": "Log-based recovery, shadow paging, ARIES, NoSQL architectures, and distributed databases."
+    },
+    {
+      "id": "unit-cn-1",
+      "subject_id": "sub-cn",
+      "unit_number": 1,
+      "unit_name": "Physical & Data Link Layer",
+      "description": "Transmission media, framing, error detection & correction, sliding window protocols."
+    },
+    {
+      "id": "unit-cn-2",
+      "subject_id": "sub-cn",
+      "unit_number": 2,
+      "unit_name": "Medium Access Sublayer",
+      "description": "Multiple access protocols, Ethernet, hubs, bridges, switches, and VLANs."
+    },
+    {
+      "id": "unit-cn-3",
+      "subject_id": "sub-cn",
+      "unit_number": 3,
+      "unit_name": "Network Layer",
+      "description": "IPv4, IPv6 routing algorithms, congestion control, DHCP, ICMP, and NAT."
+    },
+    {
+      "id": "unit-cn-4",
+      "subject_id": "sub-cn",
+      "unit_number": 4,
+      "unit_name": "Transport Layer",
+      "description": "UDP, TCP connection management, flow control, congestion window, and quality of service."
+    },
+    {
+      "id": "unit-cn-5",
+      "subject_id": "sub-cn",
+      "unit_number": 5,
+      "unit_name": "Application Layer",
+      "description": "DNS, SMTP, HTTP, FTP, and basic network cryptography/security."
+    },
+    {
+      "id": "unit-os-1",
+      "subject_id": "sub-os",
+      "unit_number": 1,
+      "unit_name": "OS Overview & Process Management",
+      "description": "System calls, structure, processes, context switching, CPU scheduling algorithms."
+    },
+    {
+      "id": "unit-os-2",
+      "subject_id": "sub-os",
+      "unit_number": 2,
+      "unit_name": "Process Synchronization",
+      "description": "Critical sections, semaphores, monitors, classical synchronization problems, and deadlocks."
+    },
+    {
+      "id": "unit-os-3",
+      "subject_id": "sub-os",
+      "unit_number": 3,
+      "unit_name": "Memory Management",
+      "description": "Paging, segmentation, page replacement algorithms, Thrashing, and translation lookaside buffer."
+    },
+    {
+      "id": "unit-os-4",
+      "subject_id": "sub-os",
+      "unit_number": 4,
+      "unit_name": "Storage & File Systems",
+      "description": "Directory structure, allocation methods, disk head scheduling, RAID, and free space management."
+    },
+    {
+      "id": "unit-os-5",
+      "subject_id": "sub-os",
+      "unit_number": 5,
+      "unit_name": "Security & Protection",
+      "description": "Access matrices, authentication, malware, and virtualization mechanics."
+    }
+  ],
+  "papers": [
+    {
+      "id": "paper-dbms-2025-ese",
+      "subject_id": "sub-dbms",
+      "year": 2025,
+      "semester": 5,
+      "exam_type": "ESE",
+      "file_name": "DBMS_ESE_2025.pdf",
+      "file_path": "/uploads/DBMS_ESE_2025.pdf",
+      "uploaded_by": "admin-1",
+      "created_at": "2026-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "paper-dbms-2024-ese",
+      "subject_id": "sub-dbms",
+      "year": 2024,
+      "semester": 5,
+      "exam_type": "ESE",
+      "file_name": "DBMS_ESE_2024.pdf",
+      "file_path": "/uploads/DBMS_ESE_2024.pdf",
+      "uploaded_by": "admin-1",
+      "created_at": "2026-03-11T00:00:00.000Z"
+    },
+    {
+      "id": "paper-dbms-2025-mse",
+      "subject_id": "sub-dbms",
+      "year": 2025,
+      "semester": 5,
+      "exam_type": "MSE",
+      "file_name": "DBMS_MSE_2025.pdf",
+      "file_path": "/uploads/DBMS_MSE_2025.pdf",
+      "uploaded_by": "admin-1",
+      "created_at": "2026-03-12T00:00:00.000Z"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-dbms-1",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-1",
+      "question_text": "Draw and explain the overall system architecture of a Database Management System.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-2",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-1",
+      "question_text": "An enterprise wants to maintain a library database. Identify entities, relationships and draw an ER Diagram with keys and cardinality.",
+      "marks": 15,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-3",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-2",
+      "question_text": "Explain different types of Outer Joins in SQL with syntax and examples.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-4",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-3",
+      "question_text": "What is normalization? Explain functional dependency and 3NF and BCNF with suitable examples.",
+      "marks": 15,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-5",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-4",
+      "question_text": "State and explain ACID properties of a transaction in detail.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-6",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-4",
+      "question_text": "Explain Two-Phase Locking (2PL) protocol. Distinguish between Conservative 2PL and Strict 2PL.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-7",
+      "paper_id": "paper-dbms-2025-ese",
+      "unit_id": "unit-dbms-5",
+      "question_text": "Discuss log-based crash recovery protocols with deferred and immediate update strategies.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-8",
+      "paper_id": "paper-dbms-2024-ese",
+      "unit_id": "unit-dbms-4",
+      "question_text": "Define Transaction. Explain ACID properties with a suitable example.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-9",
+      "paper_id": "paper-dbms-2024-ese",
+      "unit_id": "unit-dbms-3",
+      "question_text": "Discuss normalization. Define 1NF, 2NF, 3NF and BCNF along with decomposition examples.",
+      "marks": 15,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-10",
+      "paper_id": "paper-dbms-2024-ese",
+      "unit_id": "unit-dbms-1",
+      "question_text": "Design an ER diagram for a Hospital Management System showing cardinalities and primary keys.",
+      "marks": 15,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-11",
+      "paper_id": "paper-dbms-2024-ese",
+      "unit_id": "unit-dbms-2",
+      "question_text": "Explain group by and having clauses in SQL with examples.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    },
+    {
+      "id": "q-dbms-12",
+      "paper_id": "paper-dbms-2024-ese",
+      "unit_id": "unit-dbms-4",
+      "question_text": "What are serializability and locking protocols? Explain Strict Two-Phase Locking.",
+      "marks": 10,
+      "question_type": "Descriptive"
+    }
+  ],
+  "topics": [
+    {
+      "id": "top-1",
+      "unit_id": "unit-dbms-4",
+      "topic_name": "ACID Properties",
+      "importance_score": 9.8
+    },
+    {
+      "id": "top-2",
+      "unit_id": "unit-dbms-4",
+      "topic_name": "Two-Phase Locking (2PL)",
+      "importance_score": 9.2
+    },
+    {
+      "id": "top-3",
+      "unit_id": "unit-dbms-3",
+      "topic_name": "3NF & BCNF Decomposition",
+      "importance_score": 9.5
+    },
+    {
+      "id": "top-4",
+      "unit_id": "unit-dbms-1",
+      "topic_name": "ER Diagram Design",
+      "importance_score": 8.8
+    },
+    {
+      "id": "top-5",
+      "unit_id": "unit-dbms-2",
+      "topic_name": "SQL Joins & Grouping",
+      "importance_score": 8
+    },
+    {
+      "id": "top-6",
+      "unit_id": "unit-dbms-5",
+      "topic_name": "Log-based Recovery",
+      "importance_score": 7.2
+    }
+  ],
+  "question_occurrences": [
+    {
+      "id": "occ-1",
+      "question_id": "q-dbms-5",
+      "paper_id": "paper-dbms-2025-ese",
+      "year": 2025,
+      "frequency": 3
+    },
+    {
+      "id": "occ-2",
+      "question_id": "q-dbms-8",
+      "paper_id": "paper-dbms-2024-ese",
+      "year": 2024,
+      "frequency": 3
+    },
+    {
+      "id": "occ-3",
+      "question_id": "q-dbms-4",
+      "paper_id": "paper-dbms-2025-ese",
+      "year": 2025,
+      "frequency": 2
+    },
+    {
+      "id": "occ-4",
+      "question_id": "q-dbms-9",
+      "paper_id": "paper-dbms-2024-ese",
+      "year": 2024,
+      "frequency": 2
+    },
+    {
+      "id": "occ-5",
+      "question_id": "q-dbms-6",
+      "paper_id": "paper-dbms-2025-ese",
+      "year": 2025,
+      "frequency": 2
+    },
+    {
+      "id": "occ-6",
+      "question_id": "q-dbms-12",
+      "paper_id": "paper-dbms-2024-ese",
+      "year": 2024,
+      "frequency": 2
+    }
+  ],
+  "unit_analytics": [
+    {
+      "id": "ua-1",
+      "unit_id": "unit-dbms-1",
+      "total_questions": 3,
+      "total_marks": 40,
+      "weightage_percentage": 28.6,
+      "importance_score": 6.5
+    },
+    {
+      "id": "ua-2",
+      "unit_id": "unit-dbms-2",
+      "total_questions": 2,
+      "total_marks": 20,
+      "weightage_percentage": 14.3,
+      "importance_score": 6
+    },
+    {
+      "id": "ua-3",
+      "unit_id": "unit-dbms-3",
+      "total_questions": 2,
+      "total_marks": 30,
+      "weightage_percentage": 21.4,
+      "importance_score": 8.4
+    },
+    {
+      "id": "ua-4",
+      "unit_id": "unit-dbms-4",
+      "total_questions": 4,
+      "total_marks": 40,
+      "weightage_percentage": 28.6,
+      "importance_score": 10
+    },
+    {
+      "id": "ua-5",
+      "unit_id": "unit-dbms-5",
+      "total_questions": 1,
+      "total_marks": 10,
+      "weightage_percentage": 7.1,
+      "importance_score": 5.5
+    }
+  ],
+  "search_history": []
+}

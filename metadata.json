@@ -1,0 +1,6 @@
+{
+  "name": "EDUARCHIVE AI 2.0",
+  "description": "An AI-Powered Academic Intelligence and Previous Year Paper Analytics Platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
