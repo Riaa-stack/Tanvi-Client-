@@ -1,0 +1,72 @@
+@import './globals.css';
+
+@layer components {
+  /* Typography */
+  h1 {
+    font-size: var(--text-4xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+  }
+
+  h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.01em;
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+  }
+
+  p {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* Interactive Elements */
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+
+  /* Animations */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.2s infinite linear;
+    background: linear-gradient(
+      to right,
+      var(--surface-sunken) 8%,
+      var(--border-default) 18%,
+      var(--surface-sunken) 33%
+    );
+    background-size: 1000px 100%;
+  }
+
+  /* Cards */
+  .card-base {
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
+    box-shadow: var(--card-shadow);
+  }
+}

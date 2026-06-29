@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+
+  --color-success: #34A853;
+  --color-success-bg: #E6F4EA;
+  --color-warning: #FBBC05;
+  --color-warning-bg: #FEF7E0;
+  --color-danger: #EA4335;
+  --color-danger-bg: #FCE8E6;
+  --color-info: #4285F4;
+  --color-info-bg: #E8F0FE;
+
+  --color-surface-page: #F8F9FA;
+  --color-surface-card: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-surface-sunken: #F1F3F4;
+  --color-surface-overlay: rgba(0,0,0,0.50);
+
+  --color-primary: #202124;
+  --color-secondary: #5F6368;
+  --color-muted: #80868B;
+  --color-disabled: #BDC1C6;
+
+  --color-default: #DADCE0;
+  --color-strong: #9AA0A6;
+
+  --shadow-clay: inset 0 2px 4px rgba(255,255,255,0.7), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-clay-heavy: inset 0 2px 4px rgba(255,255,255,0.7), 0 8px 16px rgba(0,0,0,0.1);
+}
+
+@layer base {
+  :root {
+    /* Core brand - Google Theme */
+    --brand-primary: #4285F4;        /* Google Blue */
+    --brand-secondary: #1967D2;      
+    --brand-accent: #E8F0FE;         
+
+    /* Semantic solid colors */
+    --color-success: #34A853;        
+    --color-success-bg: #E6F4EA;
+    --color-warning: #FBBC05;        
+    --color-warning-bg: #FEF7E0;
+    --color-danger: #EA4335;         
+    --color-danger-bg: #FCE8E6;
+    --color-info: #4285F4;           
+    --color-info-bg: #E8F0FE;
+
+    /* Subject / category solid palette */
+    --subject-1: #E63946;
+    --subject-2: #2D5BE3;
+    --subject-3: #1B7A4E;
+    --subject-4: #7B2FBE;
+    --subject-5: #D35400;
+    --subject-6: #0E5A8A;
+    --subject-7: #B7410E;
+    --subject-8: #1A6B5A;
+
+    /* Difficulty level colors */
+    --difficulty-easy: #1B7A4E;
+    --difficulty-easy-bg: #E6F4EE;
+    --difficulty-medium: #B45309;
+    --difficulty-medium-bg: #FEF3C7;
+    --difficulty-hard: #C0392B;
+    --difficulty-hard-bg: #FDECEA;
+
+    /* Light Mode Surfaces */
+    --surface-page: #F7F7F5;
+    --surface-card: #FFFFFF;
+    --surface-elevated: #FFFFFF;
+    --surface-sunken: #EFEFED;
+    --surface-overlay: rgba(0,0,0,0.40);
+
+    /* Text */
+    --text-primary: #1A1A18;
+    --text-secondary: #4A4A46;
+    --text-muted: #8A8A85;
+    --text-disabled: #BDBDB8;
+    --text-on-brand: #FFFFFF;
+
+    /* Borders */
+    --border-default: #E2E2DD;
+    --border-strong: #C8C8C2;
+    --border-focus: #2D5BE3;
+
+    /* Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 999px;
+
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Scale */
+    --text-xs: 11px;
+    --text-sm: 13px;
+    --text-base: 15px;
+    --text-lg: 17px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 30px;
+    --text-4xl: 36px;
+    --text-5xl: 48px;
+
+    /* Weight */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+
+    /* Line heights */
+    --leading-tight: 1.3;
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.75;
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* Layout */
+    --sidebar-width: 240px;
+    --sidebar-collapsed: 60px;
+    --header-height: 56px;
+    --content-max-width: 1200px;
+    --content-narrow: 720px;
+
+    /* Component Tokens */
+    --btn-height-sm: 30px;
+    --btn-height-md: 36px;
+    --btn-height-lg: 44px;
+    --card-padding: 20px 24px;
+    --card-border: 1px solid var(--border-default);
+    --card-radius: var(--radius-lg);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --input-height: 36px;
+    --input-border: 1px solid var(--border-default);
+    --input-radius: var(--radius-md);
+    --input-bg: var(--surface-card);
+    --badge-height: 22px;
+    --badge-padding: 0 8px;
+    --badge-radius: var(--radius-sm);
+    --badge-font-size: var(--text-xs);
+    --badge-font-weight: var(--weight-medium);
+  }
+
+  [data-theme="dark"] {
+    --surface-page: #141412;
+    --surface-card: #1E1E1B;
+    --surface-elevated: #262622;
+    --surface-sunken: #111110;
+    --surface-overlay: rgba(0,0,0,0.65);
+
+    --text-primary: #F0F0EC;
+    --text-secondary: #A8A8A2;
+    --text-muted: #6A6A65;
+    --text-disabled: #3A3A38;
+    --text-on-brand: #FFFFFF;
+
+    --border-default: #2E2E2A;
+    --border-strong: #3E3E3A;
+    --border-focus: #5B7FFF;
+
+    --brand-accent: #1A2847;
+  /* Cards */
+  .card-base {
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Claymorphism Utilities */
+  .clay-card {
+    background: var(--surface-card);
+    border-radius: 24px;
+    box-shadow: 
+      12px 12px 24px rgba(0, 0, 0, 0.08), 
+      -12px -12px 24px #FFFFFF,
+      inset 2px 2px 8px rgba(255, 255, 255, 0.8),
+      inset -2px -2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+
+  .clay-card:hover {
+    box-shadow: 
+      16px 16px 32px rgba(0, 0, 0, 0.1), 
+      -16px -16px 32px #FFFFFF,
+      inset 2px 2px 8px rgba(255, 255, 255, 0.9),
+      inset -2px -2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .clay-btn-primary {
+    background: var(--brand-primary);
+    color: white;
+    border-radius: 16px;
+    font-weight: 600;
+    box-shadow: 
+      6px 6px 12px rgba(66, 133, 244, 0.3), 
+      -4px -4px 10px rgba(255, 255, 255, 0.9),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.3),
+      inset -2px -2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .clay-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      8px 8px 16px rgba(66, 133, 244, 0.35), 
+      -6px -6px 12px rgba(255, 255, 255, 1),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.4),
+      inset -2px -2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .clay-btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 
+      2px 2px 6px rgba(66, 133, 244, 0.2), 
+      -2px -2px 6px rgba(255, 255, 255, 0.8),
+      inset 4px 4px 8px rgba(0, 0, 0, 0.2),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.2);
+  }
+}
+
+  body {
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: var(--leading-normal);
+  }
+}
