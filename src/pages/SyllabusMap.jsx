@@ -50,11 +50,18 @@ export default function SyllabusMap() {
       const res = await api.get('/api/units', {
         params: { subject_id: activeSubject.id }
       });
-      setUnits(res.data);
-      if (res.data.length > 0) {
-        setSelectedUnit(res.data[0]);
-      } else {
-        setSelectedUnit(null);
+      const unitList = res.data.units || [];
+
+      setUnits(unitList);
+      if (unitList.length > 0) {
+
+      setSelectedUnit(unitList[0]);
+
+      }
+      else {
+
+          setSelectedUnit(null);
+
       }
     } catch (err) {
       console.error('Failed to load subject syllabus units:', err);

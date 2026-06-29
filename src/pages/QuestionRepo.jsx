@@ -31,19 +31,15 @@ export default function QuestionRepo() {
       const res = await api.get('/api/units', {
         params: { subject_id: activeSubject.id }
       });
-      setUnits(res.data);
+
+      setUnits(res.data.units || []);
     } catch (err) {
       console.error('Failed to fetch units for filters:', err);
     }
   };
 
   const fetchSearchHistory = async () => {
-    try {
-      const res = await api.get('/api/search-history');
-      setSearchHistory(res.data);
-    } catch (err) {
-      console.error('Failed to load search history:', err);
-    }
+    setSearchHistory([]);
   };
 
   const handleSearch = async (e) => {
@@ -64,13 +60,13 @@ export default function QuestionRepo() {
       const repeatsRes = await api.get('/api/questions/repeated', {
         params: { subject_id: activeSubject?.id }
       });
-
-      const processed = res.data.map(q => {
-        const foundRepeat = repeatsRes.data.find(r => r.id === q.id || r.question_text.toLowerCase().trim() === q.question_text.toLowerCase().trim());
+      const repeatedQuestions = repeatsRes.data.questions || [];
+      const processed = (res.data.questions || []).map(q => {
+        const foundRepeat = repeatedQuestions.find(r => r.id === q.id || r.question_text.toLowerCase().trim() === q.question_text.toLowerCase().trim());
         return {
           ...q,
-          frequency: foundRepeat ? foundRepeat.frequency : 1,
-          years: foundRepeat ? foundRepeat.years : []
+          frequency: foundRepeat?.frequency || 1,
+          years: foundRepeat?.years || []
         };
       });
 
@@ -237,7 +233,9 @@ export default function QuestionRepo() {
             </div>
           ) : questions.length > 0 ? (
             questions.map((q, idx) => {
-              const unitObj = units.find(u => u.id === q.unit_id);
+              const unitObj = Array.isArray(units)
+              ? units.find(u => u.id === q.unit_id)
+              : null;
               const isRepeated = q.frequency > 1;
 
               return (

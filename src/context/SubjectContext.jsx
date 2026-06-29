@@ -12,14 +12,12 @@ const SubjectContext = createContext(null);
 export const SubjectProvider = ({ children }) => {
 
   const [subjects, setSubjects] = useState([]);
-
   const [activeSubject, setActiveSubject] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
-  // ============================================
+  // ==========================================
   // Fetch Subjects
-  // ============================================
+  // ==========================================
 
   const fetchSubjects = async () => {
 
@@ -31,8 +29,8 @@ export const SubjectProvider = ({ children }) => {
 
       if (!token) {
 
-        setLoading(false);
-
+        setSubjects([]);
+        setActiveSubject(null);
         return;
 
       }
@@ -48,9 +46,7 @@ export const SubjectProvider = ({ children }) => {
       );
 
       const found = subjectList.find(
-
         subject => subject.id === savedId
-
       );
 
       if (found) {
@@ -63,12 +59,14 @@ export const SubjectProvider = ({ children }) => {
         setActiveSubject(subjectList[0]);
 
         localStorage.setItem(
-
           "active_subject_id",
-
           subjectList[0].id
-
         );
+
+      }
+      else {
+
+        setActiveSubject(null);
 
       }
 
@@ -76,12 +74,12 @@ export const SubjectProvider = ({ children }) => {
     catch (err) {
 
       console.error(
-
-        "Failed to fetch subjects",
-
+        "Failed to fetch subjects:",
         err
-
       );
+
+      setSubjects([]);
+      setActiveSubject(null);
 
     }
     finally {
@@ -98,9 +96,9 @@ export const SubjectProvider = ({ children }) => {
 
   }, []);
 
-  // ============================================
+  // ==========================================
   // Select Subject
-  // ============================================
+  // ==========================================
 
   const selectSubject = (subject) => {
 
@@ -109,20 +107,15 @@ export const SubjectProvider = ({ children }) => {
     if (subject) {
 
       localStorage.setItem(
-
         "active_subject_id",
-
         subject.id
-
       );
 
     }
     else {
 
       localStorage.removeItem(
-
         "active_subject_id"
-
       );
 
     }
@@ -132,21 +125,13 @@ export const SubjectProvider = ({ children }) => {
   return (
 
     <SubjectContext.Provider
-
       value={{
-
         subjects,
-
         activeSubject,
-
         selectSubject,
-
         loading,
-
         refreshSubjects: fetchSubjects
-
       }}
-
     >
 
       {children}
