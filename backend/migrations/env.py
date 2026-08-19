@@ -1,71 +1,124 @@
 """
-Alembic migration environment configuration.
-Reads DATABASE_URL from .env, imports all models for autogenerate support.
+Alembic migration environment for AAIP Backend.
 """
-import os
-import sys
-from logging.config import fileConfig
+
+from flask import current_app
 
 from alembic import context
-from dotenv import load_dotenv
-from sqlalchemy import engine_from_config, pool
 
-# Load environment variables
-load_dotenv()
 
-# Ensure the backend directory is on sys.path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# ============================================================
+# Alembic Config
+# ============================================================
 
-# Alembic Config object
 config = context.config
 
-# Override sqlalchemy.url from environment
-database_url = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/aaip_db")
-config.set_main_option("sqlalchemy.url", database_url)
 
-# Setup logging
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# ============================================================
+# Do NOT use fileConfig()
+#
+# The project's alembic.ini does not contain the logging
+# sections required by Python's logging.config.fileConfig().
+# Flask already configures application logging.
+# ============================================================
 
-# Import db and all models so Alembic can detect schema
-from app.extensions import db
-import app.models  # noqa: F401 — triggers all model imports
 
-target_metadata = db.metadata
+# ============================================================
+# SQLAlchemy Metadata
+# ============================================================
 
+def get_engine():
+    """Get SQLAlchemy engine from Flask-Migrate."""
+
+    return current_app.extensions["migrate"].db.engine
+
+
+def get_metadata():
+    """Get SQLAlchemy metadata from Flask-Migrate."""
+
+    return current_app.extensions["migrate"].db.metadata
+
+
+target_metadata = get_metadata()
+
+
+# ============================================================
+# Database URL
+# ============================================================
+
+def get_database_url():
+    """
+    Get database URL from Flask configuration.
+
+    ConfigParser treats '%' as interpolation syntax.
+    PostgreSQL URLs can contain encoded values such as
+    %40, so escape '%' before passing the URL to Alembic.
+    """
+
+    database_url = current_app.config.get(
+        "SQLALCHEMY_DATABASE_URI"
+    )
+
+    if not database_url:
+        raise RuntimeError(
+            "SQLALCHEMY_DATABASE_URI is not configured."
+        )
+
+    return database_url.replace("%", "%%")
+
+
+# ============================================================
+# Offline Migration
+# ============================================================
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode (no DB connection needed)."""
-    url = config.get_main_option("sqlalchemy.url")
+    """Run migrations without connecting to the database."""
+
+    database_url = get_database_url()
+
     context.configure(
-        url=url,
+        url=database_url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={
+            "paramstyle": "named"
+        },
         compare_type=True,
     )
+
     with context.begin_transaction():
         context.run_migrations()
 
 
+# ============================================================
+# Online Migration
+# ============================================================
+
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode (requires live DB connection)."""
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    """Run migrations using a live database connection."""
+
+    connectable = get_engine()
+
     with connectable.connect() as connection:
+
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
             compare_type=True,
         )
+
         with context.begin_transaction():
             context.run_migrations()
 
 
+# ============================================================
+# Run Migration
+# ============================================================
+
 if context.is_offline_mode():
+
     run_migrations_offline()
+
 else:
+
     run_migrations_online()

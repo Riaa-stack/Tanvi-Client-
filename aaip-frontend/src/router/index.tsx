@@ -31,8 +31,10 @@ import AdminDashboard from '@/pages/admin/AdminDashboard'
 import PapersManagePage from '@/pages/admin/PapersManagePage'
 import PaperDetailAdminPage from '@/pages/admin/PaperDetailAdminPage'
 import SubjectsManagePage from '@/pages/admin/SubjectsManagePage'
+import SubjectFormPage from '@/pages/admin/SubjectFormPage'
 import SyllabusEditorPage from '@/pages/admin/SyllabusEditorPage'
 import SemestersPage from '@/pages/admin/SemestersPage'
+import SemesterFormPage from '@/pages/admin/SemesterFormPage'
 import UsersPage from '@/pages/admin/UsersPage'
 import AnalyticsDashboard from '@/pages/admin/AnalyticsDashboard'
 import UnitWeightagePage from '@/pages/admin/UnitWeightagePage'
@@ -42,72 +44,249 @@ import ClustersPage from '@/pages/admin/ClustersPage'
 import AIJobsPage from '@/pages/admin/AIJobsPage'
 
 export const router = createBrowserRouter([
-  // Public
-  { path: '/', element: <LandingPage /> },
+  // ============================================================
+  // PUBLIC
+  // ============================================================
+
+  {
+    path: '/',
+    element: <LandingPage />,
+  },
+
   {
     element: <PublicRoute />,
     children: [
       {
         element: <AuthLayout />,
         children: [
-          { path: '/login', element: <LoginPage /> },
-          { path: '/register', element: <RegisterPage /> },
-        ]
-      }
+          {
+            path: '/login',
+            element: <LoginPage />,
+          },
+          {
+            path: '/register',
+            element: <RegisterPage />,
+          },
+        ],
+      },
     ],
   },
 
-  // Student
+  // ============================================================
+  // STUDENT
+  // ============================================================
+
   {
-    element: <ProtectedRoute allowedRoles={[UserRole.STUDENT]} />,
+    element: (
+      <ProtectedRoute
+        allowedRoles={[UserRole.STUDENT]}
+      />
+    ),
+
     children: [
       {
         element: <AppShell role="student" />,
+
         children: [
-          { path: '/dashboard', element: <StudentDashboard /> },
-          { path: '/subjects', element: <SubjectsPage /> },
-          { path: '/subjects/:subjectId', element: <SubjectDetailPage /> },
-          { path: '/subjects/:subjectId/units/:unitId', element: <UnitDashboardPage /> },
-          { path: '/subjects/:subjectId/papers', element: <PapersPage /> },
-          { path: '/papers', element: <PapersPage /> }, // Search/filter by query
-          { path: '/papers/:paperId', element: <PaperDetailPage /> },
-          { path: '/search', element: <SearchPage /> },
-          { path: '/chat', element: <ChatPage /> },
-          { path: '/chat/:subjectId', element: <ChatPage /> },
-          { path: '/predictions/:subjectId', element: <PredictionsPage /> },
-          { path: '/bookmarks', element: <BookmarksPage /> },
-          { path: '/profile', element: <ProfilePage /> },
+          {
+            path: '/dashboard',
+            element: <StudentDashboard />,
+          },
+
+          {
+            path: '/subjects',
+            element: <SubjectsPage />,
+          },
+
+          {
+            path: '/subjects/:subjectId',
+            element: <SubjectDetailPage />,
+          },
+
+          {
+            path: '/subjects/:subjectId/units/:unitId',
+            element: <UnitDashboardPage />,
+          },
+
+          {
+            path: '/subjects/:subjectId/papers',
+            element: <PapersPage />,
+          },
+
+          {
+            path: '/papers',
+            element: <PapersPage />,
+          },
+
+          {
+            path: '/papers/:paperId',
+            element: <PaperDetailPage />,
+          },
+
+          {
+            path: '/search',
+            element: <SearchPage />,
+          },
+
+          {
+            path: '/chat',
+            element: <ChatPage />,
+          },
+
+          {
+            path: '/chat/:subjectId',
+            element: <ChatPage />,
+          },
+
+          {
+            path: '/predictions/:subjectId',
+            element: <PredictionsPage />,
+          },
+
+          {
+            path: '/bookmarks',
+            element: <BookmarksPage />,
+          },
+
+          {
+            path: '/profile',
+            element: <ProfilePage />,
+          },
         ],
       },
     ],
   },
 
-  // Admin
+  // ============================================================
+  // ADMIN
+  // ============================================================
+
   {
-    element: <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]} />,
+    element: (
+      <ProtectedRoute
+        allowedRoles={[
+          UserRole.ADMIN,
+          UserRole.SUPER_ADMIN,
+        ]}
+      />
+    ),
+
     children: [
       {
         element: <AppShell role="admin" />,
+
         children: [
-          { path: '/admin', element: <AdminDashboard /> },
-          { path: '/admin/papers', element: <PapersManagePage /> },
-          { path: '/admin/papers/:paperId', element: <PaperDetailAdminPage /> },
-          { path: '/admin/subjects', element: <SubjectsManagePage /> },
-          { path: '/admin/subjects/:subjectId/syllabus', element: <SyllabusEditorPage /> },
-          { path: '/admin/semesters', element: <SemestersPage /> },
-          { path: '/admin/analytics', element: <AnalyticsDashboard /> },
-          { path: '/admin/analytics/unit-weightage/:subjectId', element: <UnitWeightagePage /> },
-          { path: '/admin/analytics/trends/:subjectId', element: <TrendsPage /> },
-          { path: '/admin/analytics/probability/:subjectId', element: <ProbabilityPage /> },
-          { path: '/admin/analytics/clusters/:subjectId', element: <ClustersPage /> },
-          { path: '/admin/ai-jobs', element: <AIJobsPage /> },
-          // Super Admin Only (Handled inside UsersPage or with further nesting)
-          { path: '/admin/users', element: <UsersPage /> },
+          {
+            path: '/admin',
+            element: <AdminDashboard />,
+          },
+
+          // ====================================================
+          // PAPERS
+          // ====================================================
+
+          {
+            path: '/admin/papers',
+            element: <PapersManagePage />,
+          },
+
+          {
+            path: '/admin/papers/:paperId',
+            element: <PaperDetailAdminPage />,
+          },
+
+          // ====================================================
+          // SUBJECTS
+          // IMPORTANT: "new" route must exist
+          // ====================================================
+
+          {
+            path: '/admin/subjects',
+            element: <SubjectsManagePage />,
+          },
+
+          {
+            path: '/admin/subjects/new',
+            element: <SubjectFormPage />,
+          },
+
+          {
+            path: '/admin/subjects/:subjectId/syllabus',
+            element: <SyllabusEditorPage />,
+          },
+
+          // ====================================================
+          // SEMESTERS
+          // IMPORTANT: "new" route must exist
+          // ====================================================
+
+          {
+            path: '/admin/semesters',
+            element: <SemestersPage />,
+          },
+
+          {
+            path: '/admin/semesters/new',
+            element: <SemesterFormPage />,
+          },
+
+          // ====================================================
+          // ANALYTICS
+          // ====================================================
+
+          {
+            path: '/admin/analytics',
+            element: <AnalyticsDashboard />,
+          },
+
+          {
+            path: '/admin/analytics/unit-weightage/:subjectId',
+            element: <UnitWeightagePage />,
+          },
+
+          {
+            path: '/admin/analytics/trends/:subjectId',
+            element: <TrendsPage />,
+          },
+
+          {
+            path: '/admin/analytics/probability/:subjectId',
+            element: <ProbabilityPage />,
+          },
+
+          {
+            path: '/admin/analytics/clusters/:subjectId',
+            element: <ClustersPage />,
+          },
+
+          // ====================================================
+          // AI JOBS
+          // ====================================================
+
+          {
+            path: '/admin/ai-jobs',
+            element: <AIJobsPage />,
+          },
+
+          // ====================================================
+          // USERS
+          // ====================================================
+
+          {
+            path: '/admin/users',
+            element: <UsersPage />,
+          },
         ],
       },
     ],
   },
 
+  // ============================================================
   // 404
-  { path: '*', element: <NotFoundPage /> },
+  // ============================================================
+
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ])
