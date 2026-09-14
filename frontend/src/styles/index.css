@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --pencil-primary: #5b4fe8;
+    --pencil-secondary: #4338ca;
+    --pencil-dark: #312e81;
+    --pencil-eraser: #f472b6;
+    --pencil-wood: #fed7aa;
+    --pencil-graphite: #374151;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* ── Notebook ruled lines & paper texture ─────────────────────────────────── */
+.notebook-ruled-bg {
+  background-color: #fdfbf7;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    #e8e1d3 32px
+  );
+  background-attachment: local;
+}
+
+.notebook-grid-bg {
+  background-color: #fdfbf7;
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, #ece4d6 1px, transparent 1px),
+    linear-gradient(to bottom, #ece4d6 1px, transparent 1px);
+}
+
+.notebook-margin-line {
+  position: relative;
+}
+
+.notebook-margin-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3.5rem;
+  width: 2px;
+  background-color: #f8b4b4;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Organic Highlighter Effects ─────────────────────────────────────────── */
+.highlight-yellow {
+  background: linear-gradient(104deg, rgba(254, 240, 138, 0) 0.9%, rgba(254, 240, 138, 0.85) 2.4%, rgba(254, 240, 138, 0.6) 94%, rgba(254, 240, 138, 0.1) 98%);
+  border-radius: 4px 6px 3px 5px;
+  padding: 0 4px;
+}
+
+.highlight-pink {
+  background: linear-gradient(104deg, rgba(251, 207, 232, 0) 0.9%, rgba(251, 207, 232, 0.85) 2.4%, rgba(251, 207, 232, 0.6) 94%, rgba(251, 207, 232, 0.1) 98%);
+  border-radius: 5px 3px 6px 4px;
+  padding: 0 4px;
+}
+
+.highlight-blue {
+  background: linear-gradient(104deg, rgba(186, 230, 253, 0) 0.9%, rgba(186, 230, 253, 0.85) 2.4%, rgba(186, 230, 253, 0.6) 94%, rgba(186, 230, 253, 0.1) 98%);
+  border-radius: 4px 5px 4px 6px;
+  padding: 0 4px;
+}
+
+.highlight-purple {
+  background: linear-gradient(104deg, rgba(233, 213, 255, 0) 0.9%, rgba(233, 213, 255, 0.85) 2.4%, rgba(233, 213, 255, 0.6) 94%, rgba(233, 213, 255, 0.1) 98%);
+  border-radius: 3px 6px 4px 5px;
+  padding: 0 4px;
+}
+
+.highlight-green {
+  background: linear-gradient(104deg, rgba(187, 247, 208, 0) 0.9%, rgba(187, 247, 208, 0.85) 2.4%, rgba(187, 247, 208, 0.6) 94%, rgba(187, 247, 208, 0.1) 98%);
+  border-radius: 6px 4px 5px 3px;
+  padding: 0 4px;
+}
+
+/* ── Handwritten Underline ────────────────────────────────────────────────── */
+.hand-underline {
+  position: relative;
+}
+
+.hand-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0,5 Q25,1 50,5 T100,4' fill='none' stroke='%235b4fe8' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+
+.hand-underline-yellow::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M0,5 Q25,1 50,5 T100,4' fill='none' stroke='%23eab308' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ── Washi Tape ───────────────────────────────────────────────────────────── */
+.washi-tape {
+  position: absolute;
+  height: 22px;
+  width: 70px;
+  background: rgba(254, 240, 138, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 2px dashed rgba(0, 0, 0, 0.05);
+  border-right: 2px dashed rgba(0, 0, 0, 0.05);
+  transform: rotate(-3deg);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.washi-tape-pink {
+  background: rgba(251, 207, 232, 0.75);
+}
+
+.washi-tape-blue {
+  background: rgba(186, 230, 253, 0.75);
+}
+
+/* ── Custom Subtle Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.45);
+}
+
+/* ── Flip Card 3D Preservation ────────────────────────────────────────────── */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
