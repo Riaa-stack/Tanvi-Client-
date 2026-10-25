@@ -282,6 +282,22 @@ export interface Note {
   analysis?: NoteAnalysis | null;
 }
 
+export interface TeacherNote {
+  id: string;
+  teacher_id: string;
+  teacher_name?: string;
+  title: string;
+  description?: string;
+  subject_name: string;
+  semester_name: string;
+  branch_name?: string;
+  original_filename: string;
+  file_size: number;
+  mime_type: string;
+  uploaded_at: string;
+  download_url: string;
+}
+
 export interface FlashcardItem {
   front: string;
   back: string;

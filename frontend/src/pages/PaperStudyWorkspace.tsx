@@ -699,41 +699,80 @@ export const PaperStudyWorkspace: React.FC = () => {
                     {/* TAB: Ask AI */}
                     {activeIntelligenceTab === 'ask_ai' && (
                       <div className="space-y-4">
-                        <div className="p-3 bg-brand-50 border border-brand-200 rounded-xl text-xs text-brand-900 font-sans">
-                          💡 Ask anything about this exam paper. Answers are strictly grounded with citations.
+                        <div className="p-3 bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 rounded-xl text-xs text-brand-900 dark:text-brand-300 font-sans">
+                          💡 <strong>EduArchive AI Assistant:</strong> Ask anything about this question paper (marks, units, specific questions) or general concepts, algorithms, and outside academic topics.
+                        </div>
+
+                        {/* Quick Prompt Suggestions */}
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {[
+                            'Which unit carries maximum marks?',
+                            'Explain Question 1 solution step-by-step',
+                            'What are the key concepts tested here?',
+                            'How to score full marks in numerical questions?',
+                          ].map((suggestion, sIdx) => (
+                            <button
+                              key={sIdx}
+                              type="button"
+                              onClick={() => {
+                                setAiQuestion(suggestion);
+                              }}
+                              className="text-[11px] font-sans px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-slate-700 transition-colors"
+                            >
+                              ✨ {suggestion}
+                            </button>
+                          ))}
                         </div>
 
                         {/* Conversational turns */}
-                        <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
-                          {aiAnswers.map((item, idx) => (
-                            <div key={idx} className="space-y-2 text-xs">
-                              <div className="p-2.5 bg-slate-100 rounded-xl text-slate-800 font-medium self-end">
-                                💬 {item.question}
-                              </div>
-                              <div className="p-3.5 bg-white rounded-xl border border-stone-200 text-slate-900 leading-relaxed shadow-xs font-serif">
-                                {item.response.answer}
-
-                                {item.response.sources?.length > 0 && (
-                                  <div className="mt-2.5 pt-2 border-t border-stone-200/80">
-                                    <div className="font-mono text-[10px] font-bold text-slate-500 uppercase mb-1">
-                                      Sources Cited:
-                                    </div>
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {item.response.sources.map((s, sIdx) => (
-                                        <button
-                                          key={sIdx}
-                                          onClick={() => jumpToPage(s.page || 1)}
-                                          className="font-mono text-[10px] px-2 py-0.5 bg-purple-50 text-purple-800 border border-purple-200 rounded hover:bg-purple-100"
-                                        >
-                                          Page {s.page || 1} • {s.question_number || 'Q'}
-                                        </button>
-                                      ))}
-                                    </div>
+                        <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                          {aiAnswers.length > 0 ? (
+                            aiAnswers.map((item, idx) => (
+                              <div key={idx} className="space-y-2 text-xs">
+                                <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-800 dark:text-slate-200 font-medium">
+                                  💬 <span className="font-bold">You:</span> {item.question}
+                                </div>
+                                <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-stone-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 leading-relaxed shadow-xs font-sans whitespace-pre-wrap">
+                                  <div className="flex items-center gap-1.5 text-brand-600 dark:text-brand-400 font-bold mb-1.5 text-xs font-mono">
+                                    <Sparkles size={14} /> AI Explanation:
                                   </div>
-                                )}
+                                  <div className="text-xs leading-relaxed">
+                                    {item.response.answer}
+                                  </div>
+
+                                  {item.response.sources?.length > 0 && (
+                                    <div className="mt-3 pt-2.5 border-t border-stone-200/80 dark:border-slate-800">
+                                      <div className="font-mono text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
+                                        Sources Cited:
+                                      </div>
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {item.response.sources.map((s, sIdx) => (
+                                          <button
+                                            key={sIdx}
+                                            type="button"
+                                            onClick={() => jumpToPage(s.page || 1)}
+                                            className="font-mono text-[10px] px-2 py-0.5 bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded hover:bg-purple-100"
+                                          >
+                                            Page {s.page || 1} • {s.question_number || 'Q'}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-6 text-slate-400 dark:text-slate-500 font-sans text-xs">
+                              No questions asked yet. Type any question below or pick a quick suggestion above!
                             </div>
-                          ))}
+                          )}
+
+                          {isAiLoading && (
+                            <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-stone-200 dark:border-slate-800 shadow-xs">
+                              <PencilLoader size="xs" message="Generating grounded academic answer with Gemini 3.8 Flash..." />
+                            </div>
+                          )}
                         </div>
 
                         {/* Input Box */}
@@ -742,13 +781,13 @@ export const PaperStudyWorkspace: React.FC = () => {
                             type="text"
                             value={aiQuestion}
                             onChange={(e) => setAiQuestion(e.target.value)}
-                            placeholder="e.g. Which unit carries maximum marks?"
-                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-stone-300 bg-white text-xs font-sans focus:outline-hidden focus:ring-2 focus:ring-brand-500 shadow-xs"
+                            placeholder="Ask any question about this paper or general syllabus..."
+                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-sans text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-brand-500 shadow-xs"
                           />
                           <button
                             type="submit"
                             disabled={isAiLoading || !aiQuestion.trim()}
-                            className="absolute right-1.5 top-1.5 p-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50 transition-colors"
+                            className="absolute right-1.5 top-1.5 p-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg disabled:opacity-50 transition-colors shadow-xs"
                           >
                             <Send size={13} />
                           </button>

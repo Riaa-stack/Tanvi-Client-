@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, Lock, ArrowRight, AlertCircle, Check } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/services/api/auth';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { toast } from '@/store/useToastStore';
 
 export const RegisterPage: React.FC = () => {
@@ -16,8 +17,14 @@ export const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { login } = useAuthStore();
+  const { login, isAuthenticated, role: userRole } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      navigate(userRole === 'TEACHER' ? '/teacher/dashboard' : '/student/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +74,12 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f1e8] flex flex-col justify-center items-center p-4 selection:bg-brand-100">
+    <div className="min-h-screen bg-[#f5f1e8] dark:bg-slate-950 flex flex-col justify-center items-center p-4 selection:bg-brand-100 transition-colors duration-200 relative">
+      {/* Top Right Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Brand Header */}
       <div className="text-center mb-6">
         <NavLink to="/" className="inline-flex items-center gap-2">
@@ -75,16 +87,16 @@ export const RegisterPage: React.FC = () => {
             ✏️
           </div>
           <div className="text-left">
-            <div className="font-extrabold text-2xl text-ink font-sans tracking-tight">
-              EduArchive AI <span className="text-xs text-brand-600 font-mono font-bold bg-brand-50 px-1.5 py-0.5 rounded-full border border-brand-200">2.0</span>
+            <div className="font-extrabold text-2xl text-ink dark:text-slate-100 font-sans tracking-tight">
+              EduArchive AI <span className="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold bg-brand-50 dark:bg-brand-950/80 px-1.5 py-0.5 rounded-full border border-brand-200 dark:border-brand-800">2.0</span>
             </div>
-            <div className="text-xs text-slate-500 font-handwriting">Smart Academic Intelligence</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-handwriting">Smart Academic Intelligence</div>
           </div>
         </NavLink>
       </div>
 
       {/* Register Card */}
-      <div className="w-full max-w-md bg-[#fdfbf7] notebook-ruled-bg rounded-3xl shadow-notebook border border-stone-300 p-8 relative overflow-hidden">
+      <div className="w-full max-w-md bg-[#fdfbf7] dark:bg-slate-900 rounded-3xl shadow-notebook border border-stone-300 dark:border-slate-800 p-8 relative overflow-hidden transition-colors">
         <div className="mb-6">
           <h1 className="font-handwriting font-bold text-2xl md:text-3xl text-ink">
             Create Your Account ✨

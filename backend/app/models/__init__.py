@@ -14,6 +14,7 @@ from app.models.paper_question import PaperQuestion, QuestionType, DifficultyLev
 from app.models.paper_analysis import PaperAnalysis
 from app.models.repetition import QuestionRepetitionGroup, QuestionRepetitionOccurrence
 from app.models.historical_analysis import SubjectHistoricalAnalysis, EvidenceLevel
+from app.models.teacher_note import TeacherNote
 from app.models.note import Note, NoteStatus
 from app.models.note_analysis import NoteAnalysis
 from app.models.chat import ChatSession, ChatMessage, MessageRole
@@ -36,6 +37,7 @@ __all__ = [
     "QuestionRepetitionOccurrence",
     "SubjectHistoricalAnalysis",
     "EvidenceLevel",
+    "TeacherNote",
     "Note",
     "NoteStatus",
     "NoteAnalysis",

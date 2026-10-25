@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { Bot, Sparkles, BookOpen, User, Bell } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useStudyStore } from '@/store/useStudyStore';
+import { ThemeToggle } from './ThemeToggle';
 
 interface TopBarProps {
   title?: string;
@@ -71,9 +72,12 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         )}
 
+        <ThemeToggle />
+
         <NavLink
           to="/profile"
           className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 border border-stone-200 flex items-center justify-center text-slate-600 transition-colors"
+          title="Profile"
         >
           <User size={15} />
         </NavLink>

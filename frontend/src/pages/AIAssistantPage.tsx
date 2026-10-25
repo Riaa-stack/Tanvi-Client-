@@ -125,7 +125,7 @@ export const AIAssistantPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen bg-[#f7f4ed]">
+    <div className="flex-1 flex flex-col min-h-screen bg-[#f7f4ed] dark:bg-slate-950 transition-colors duration-200">
       <TopBar title="Academic RAG Assistant" />
 
       <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
@@ -213,24 +213,24 @@ export const AIAssistantPage: React.FC = () => {
                           </div>
                         )}
                         <div
-                          className={`p-3.5 rounded-2xl max-w-lg leading-relaxed font-sans ${
+                          className={`p-3.5 rounded-2xl max-w-lg leading-relaxed font-sans whitespace-pre-wrap ${
                             msg.sender === 'USER'
                               ? 'bg-brand-600 text-white font-medium shadow-xs'
-                              : 'bg-white/95 border border-stone-200 text-slate-900 shadow-xs font-serif'
+                              : 'bg-white/95 dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 shadow-xs'
                           }`}
                         >
                           {msg.content}
 
                           {msg.sources_cited && msg.sources_cited.length > 0 && (
-                            <div className="mt-2 pt-2 border-t border-stone-200/80">
-                              <div className="font-mono text-[10px] text-slate-500 font-bold uppercase mb-1">
+                            <div className="mt-2 pt-2 border-t border-stone-200/80 dark:border-slate-800">
+                              <div className="font-mono text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">
                                 Cited Sources:
                               </div>
                               <div className="flex flex-wrap gap-1">
                                 {msg.sources_cited.map((src: any, sIdx: number) => (
                                   <span
                                     key={sIdx}
-                                    className="font-mono text-[10px] bg-purple-50 text-purple-800 px-2 py-0.5 rounded border border-purple-200"
+                                    className="font-mono text-[10px] bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800"
                                   >
                                     Page {src.page || 1} • {src.paper_title || 'Paper'}
                                   </span>
@@ -242,14 +242,33 @@ export const AIAssistantPage: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-12 space-y-2">
+                    <div className="text-center py-8 space-y-4">
                       <div className="text-3xl">✏️</div>
-                      <h4 className="font-handwriting font-bold text-xl text-ink">
-                        What would you like to study today?
+                      <h4 className="font-handwriting font-bold text-2xl text-ink dark:text-slate-100">
+                        Ask Any Academic Question
                       </h4>
-                      <p className="text-xs text-slate-500 font-sans max-w-sm mx-auto">
-                        Ask about question patterns, mark distributions, specific topics, or algorithm explanations.
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-sans max-w-md mx-auto">
+                        Ask about question paper patterns, marking weightage, or general academic concepts and code algorithms.
                       </p>
+
+                      <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto pt-2">
+                        {[
+                          'Which unit has highest repeated questions?',
+                          'Explain QuickSort & its time complexity',
+                          'Difference between TCP and UDP',
+                          'How to prepare for Semester 5 exams?',
+                          'Explain Normalization (1NF, 2NF, 3NF)',
+                        ].map((chip, cIdx) => (
+                          <button
+                            key={cIdx}
+                            type="button"
+                            onClick={() => setInputText(chip)}
+                            className="text-xs px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-slate-700 transition-colors"
+                          >
+                            💡 {chip}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
 

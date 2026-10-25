@@ -161,3 +161,101 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* ── Dark Mode System & Theme Styling ─────────────────────────────────────── */
+.dark body {
+  background-color: #0b0f19;
+  color: #e2e8f0;
+}
+
+.dark .notebook-ruled-bg {
+  background-color: #111827;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(255, 255, 255, 0.06) 32px
+  );
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .notebook-grid-bg {
+  background-color: #111827;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .notebook-margin-line::before {
+  background-color: #f43f5e;
+  opacity: 0.5;
+}
+
+.dark .text-ink {
+  color: #f8fafc !important;
+}
+
+.dark header,
+.dark aside,
+.dark .bg-\[\#fbf9f5\],
+.dark .bg-\[\#fcfbf7\],
+.dark .bg-\[\#f7f4ed\],
+.dark .bg-\[\#f3efe6\],
+.dark .bg-\[\#f5f1e8\] {
+  background-color: #0b0f19 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .bg-white,
+.dark .bg-white\/80,
+.dark .bg-white\/90,
+.dark .bg-white\/95,
+.dark .bg-\[\#fdfbf7\] {
+  background-color: #131b2e !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  color: #e2e8f0;
+}
+
+.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .border-stone-200,
+.dark .border-stone-300 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* ── Personalization Font Scaling ─────────────────────────────────────────── */
+[data-font-size="sm"] {
+  font-size: 14px;
+}
+
+[data-font-size="base"] {
+  font-size: 16px;
+}
+
+[data-font-size="lg"] {
+  font-size: 18px;
+}
+

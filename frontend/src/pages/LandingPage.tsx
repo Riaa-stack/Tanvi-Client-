@@ -16,49 +16,51 @@ import {
 import { StarDoodle, LightbulbDoodle, ArrowDoodle } from '@/components/notebook/DoodleIcons';
 import { StickyNote } from '@/components/notebook/StickyNote';
 import { Highlighter } from '@/components/notebook/Highlighter';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#f7f4ed] text-ink font-sans selection:bg-brand-100 selection:text-brand-900">
+    <div className="min-h-screen bg-[#f7f4ed] dark:bg-slate-950 text-ink dark:text-slate-100 font-sans selection:bg-brand-100 selection:text-brand-900 transition-colors duration-200">
       {/* ── Top Navigation Bar ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#f7f4ed]/90 backdrop-blur-md border-b border-stone-200/80 px-6 lg:px-12 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-[#f7f4ed]/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-stone-200/80 dark:border-slate-800 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white shadow-sm font-bold text-lg font-handwriting">
             ✏️
           </div>
           <div className="flex items-center gap-1">
-            <span className="font-bold text-xl tracking-tight text-ink">
+            <span className="font-bold text-xl tracking-tight text-ink dark:text-slate-100">
               EduArchive
             </span>
-            <span className="text-xs font-bold text-brand-600 bg-brand-50 border border-brand-200 px-1.5 py-0.5 rounded-full font-mono">
+            <span className="text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/80 border border-brand-200 dark:border-brand-800 px-1.5 py-0.5 rounded-full font-mono">
               AI 2.0
             </span>
           </div>
         </div>
 
         {/* Center Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700">
-          <a href="#features" className="hover:text-brand-600 transition-colors">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <a href="#features" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
             Features
           </a>
-          <a href="#students" className="hover:text-brand-600 transition-colors">
+          <a href="#students" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
             For Students
           </a>
-          <a href="#teachers" className="hover:text-brand-600 transition-colors">
+          <a href="#teachers" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
             For Teachers
           </a>
-          <a href="#how-it-works" className="hover:text-brand-600 transition-colors">
+          <a href="#how-it-works" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
             How It Works
           </a>
         </nav>
 
         {/* Right CTA */}
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <NavLink
             to="/login"
-            className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             Log In
           </NavLink>

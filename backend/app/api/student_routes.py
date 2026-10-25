@@ -324,3 +324,62 @@ def get_subject_quiz(subject_id: str):
     return success_response(data=result)
 
 
+# ── Teacher Uploaded Notes for Students (Course Materials) ─────────────────────
+
+@student_bp.route("/notes", methods=["GET"])
+@any_role_required
+def list_student_available_notes():
+    """
+    List notes uploaded by teachers with subject and semester names.
+    Allows students to browse and search course materials.
+    """
+    page, page_size = get_pagination_params(request.args)
+    subject = request.args.get("subject")
+    semester = request.args.get("semester")
+    search = request.args.get("q") or request.args.get("search")
+
+    from app.repositories.teacher_note_repository import TeacherNoteRepository
+
+    notes, total = TeacherNoteRepository.list_for_students(
+        subject=subject,
+        semester=semester,
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
+
+    return paginated_response(
+        items=[n.to_dict() for n in notes],
+        page=page,
+        page_size=page_size,
+        total=total,
+        data_key="notes",
+    )
+
+
+@student_bp.route("/notes/<note_id>/download", methods=["GET"])
+def download_teacher_note(note_id: str):
+    """
+    Download a teacher note file directly (PDF or Word document).
+    Accessible by link so students can click to download seamlessly.
+    """
+    import os
+    from flask import send_file
+    from app.repositories.teacher_note_repository import TeacherNoteRepository
+
+    note = TeacherNoteRepository.get_by_id(note_id)
+    if not note:
+        raise NotFoundError(f"Note with ID '{note_id}' not found.")
+
+    if not os.path.exists(note.file_path):
+        raise NotFoundError("Physical note file not found on server.")
+
+    return send_file(
+        note.file_path,
+        mimetype=note.mime_type or "application/octet-stream",
+        as_attachment=True,
+        download_name=note.original_filename,
+    )
+
+
+

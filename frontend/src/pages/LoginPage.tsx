@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { LogIn, Lock, Mail, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/services/api/auth';
 import { StickyNote } from '@/components/notebook/StickyNote';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { toast } from '@/store/useToastStore';
 
 export const LoginPage: React.FC = () => {
@@ -13,8 +14,14 @@ export const LoginPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
-  const { login } = useAuthStore();
+  const { login, isAuthenticated, role } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && role) {
+      navigate(role === 'TEACHER' ? '/teacher/dashboard' : '/student/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, role, navigate]);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -62,7 +69,12 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f1e8] flex flex-col justify-center items-center p-4 selection:bg-brand-100">
+    <div className="min-h-screen bg-[#f5f1e8] dark:bg-slate-950 flex flex-col justify-center items-center p-4 selection:bg-brand-100 transition-colors duration-200 relative">
+      {/* Top Right Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Brand Header */}
       <div className="text-center mb-6">
         <NavLink to="/" className="inline-flex items-center gap-2">
@@ -70,16 +82,16 @@ export const LoginPage: React.FC = () => {
             ✏️
           </div>
           <div className="text-left">
-            <div className="font-extrabold text-2xl text-ink font-sans tracking-tight">
-              EduArchive AI <span className="text-xs text-brand-600 font-mono font-bold bg-brand-50 px-1.5 py-0.5 rounded-full border border-brand-200">2.0</span>
+            <div className="font-extrabold text-2xl text-ink dark:text-slate-100 font-sans tracking-tight">
+              EduArchive AI <span className="text-xs text-brand-600 dark:text-brand-400 font-mono font-bold bg-brand-50 dark:bg-brand-950/80 px-1.5 py-0.5 rounded-full border border-brand-200 dark:border-brand-800">2.0</span>
             </div>
-            <div className="text-xs text-slate-500 font-handwriting">Smart Academic Intelligence</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-handwriting">Smart Academic Intelligence</div>
           </div>
         </NavLink>
       </div>
 
       {/* Login Card */}
-      <div className="w-full max-w-md bg-[#fdfbf7] notebook-ruled-bg rounded-3xl shadow-notebook border border-stone-300 p-8 relative overflow-hidden">
+      <div className="w-full max-w-md bg-[#fdfbf7] dark:bg-slate-900 rounded-3xl shadow-notebook border border-stone-300 dark:border-slate-800 p-8 relative overflow-hidden transition-colors">
         {/* Session Expired Banner */}
         {searchParams.get('expired') && (
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-medium">

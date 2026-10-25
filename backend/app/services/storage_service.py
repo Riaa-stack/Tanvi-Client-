@@ -21,6 +21,7 @@ logger = get_logger(__name__)
 
 ALLOWED_EXTENSIONS = {".pdf"}
 ALLOWED_MIME_TYPES = {"application/pdf"}
+ALLOWED_TEACHER_NOTE_EXTENSIONS = {".pdf", ".doc", ".docx"}
 # Additional check for PDF magic bytes
 PDF_MAGIC = b"%PDF"
 
@@ -43,6 +44,11 @@ class StorageService:
 
     def _notes_dir(self) -> Path:
         d = self._base_dir / "notes"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def _teacher_notes_dir(self) -> Path:
+        d = self._base_dir / "teacher_notes"
         d.mkdir(parents=True, exist_ok=True)
         return d
 
@@ -72,6 +78,35 @@ class StorageService:
         if header != PDF_MAGIC:
             raise FileError("File does not appear to be a valid PDF (invalid magic bytes).")
 
+    def validate_teacher_note_file(
+        self, file_stream, original_filename: str, content_length: int | None = None
+    ) -> str:
+        """
+        Validate a teacher note file (PDF or Word document).
+        Returns the determined mime_type.
+        """
+        if content_length is not None and content_length > self._max_size:
+            raise FileTooLargeError(
+                f"File size {content_length} bytes exceeds limit of {self._max_size} bytes."
+            )
+
+        ext = Path(original_filename).suffix.lower()
+        if ext not in ALLOWED_TEACHER_NOTE_EXTENSIONS:
+            raise FileError(
+                f"Invalid file extension '{ext}'. Only PDF and Word documents (.pdf, .doc, .docx) are accepted."
+            )
+
+        if ext == ".pdf":
+            mime_type = "application/pdf"
+        elif ext == ".docx":
+            mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        elif ext == ".doc":
+            mime_type = "application/msword"
+        else:
+            mime_type = "application/octet-stream"
+
+        return mime_type
+
     def store_paper(self, file_stream, original_filename: str) -> tuple[str, str, int, str]:
         """
         Store a paper PDF. Returns (stored_filename, absolute_path, file_size, checksum).
@@ -84,14 +119,22 @@ class StorageService:
         """
         return self._store(file_stream, original_filename, self._notes_dir())
 
+    def store_teacher_note(self, file_stream, original_filename: str) -> tuple[str, str, int, str]:
+        """
+        Store a teacher note (PDF or Word). Preserves file extension.
+        Returns (stored_filename, absolute_path, file_size, checksum).
+        """
+        return self._store(file_stream, original_filename, self._teacher_notes_dir())
+
     def _store(self, file_stream, original_filename: str, directory: Path) -> tuple[str, str, int, str]:
         """
         Internal: store a file stream securely.
         Returns (stored_filename, absolute_path, file_size, sha256_checksum).
         """
-        # Generate a cryptographically random filename — never use client filename
+        # Generate a cryptographically random filename with the matching extension
         random_token = secrets.token_hex(16)
-        stored_filename = f"{random_token}.pdf"
+        ext = Path(original_filename).suffix.lower() or ".pdf"
+        stored_filename = f"{random_token}{ext}"
         dest_path = directory / stored_filename
 
         # Write to temp file first, then move atomically
@@ -148,6 +191,13 @@ class StorageService:
             raise FileError("Invalid stored filename.")
         return path
 
+    def get_teacher_note_path(self, stored_filename: str) -> Path:
+        """Return the absolute path to a stored teacher note."""
+        path = (self._teacher_notes_dir() / stored_filename).resolve()
+        if not str(path).startswith(str(self._teacher_notes_dir())):
+            raise FileError("Invalid stored filename.")
+        return path
+
     def delete_paper(self, stored_filename: str) -> bool:
         """Delete a stored paper file. Returns True if deleted, False if not found."""
         return self._delete(self._papers_dir() / stored_filename)
@@ -155,6 +205,10 @@ class StorageService:
     def delete_note(self, stored_filename: str) -> bool:
         """Delete a stored note file."""
         return self._delete(self._notes_dir() / stored_filename)
+
+    def delete_teacher_note(self, stored_filename: str) -> bool:
+        """Delete a stored teacher note file."""
+        return self._delete(self._teacher_notes_dir() / stored_filename)
 
     def _delete(self, path: Path) -> bool:
         try:

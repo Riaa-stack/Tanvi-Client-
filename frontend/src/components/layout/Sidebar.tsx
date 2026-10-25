@@ -13,9 +13,11 @@ import {
   Upload,
   LogOut,
   ChevronRight,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { StickyNote } from '@/components/notebook/StickyNote';
+import { ThemeToggle } from './ThemeToggle';
 
 export const Sidebar: React.FC = () => {
   const { user, role, logout } = useAuthStore();
@@ -30,6 +32,7 @@ export const Sidebar: React.FC = () => {
     { label: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Paper Vault', path: '/student/papers', icon: FileText },
     { label: 'Study Intelligence', path: '/student/study-intelligence', icon: Compass },
+    { label: 'Syllabus', path: '/student/syllabus', icon: GraduationCap },
     { label: 'My Notes', path: '/student/notes', icon: BookOpen },
     { label: 'AI Assistant', path: '/student/assistant', icon: BotMessageSquare },
     { label: 'Quizzes', path: '/student/quizzes', icon: HelpCircle },
@@ -39,6 +42,7 @@ export const Sidebar: React.FC = () => {
     { label: 'Dashboard', path: '/teacher/dashboard', icon: LayoutDashboard },
     { label: 'Paper Vault', path: '/teacher/papers', icon: FileText },
     { label: 'Upload Paper', path: '/teacher/upload', icon: Upload },
+    { label: 'Upload Notes', path: '/teacher/notes', icon: BookOpen },
   ];
 
   const navItems = role === 'TEACHER' ? teacherNavItems : studentNavItems;
@@ -157,9 +161,13 @@ export const Sidebar: React.FC = () => {
           </StickyNote>
         )}
 
+        <div className="flex items-center justify-between pt-1">
+          <ThemeToggle showLabel={true} className="flex-1 justify-center" />
+        </div>
+
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
         >
           <LogOut size={14} />
           <span>Sign Out</span>

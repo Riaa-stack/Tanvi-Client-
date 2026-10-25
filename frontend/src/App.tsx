@@ -20,14 +20,17 @@ import { NoteStudyWorkspace } from '@/pages/NoteStudyWorkspace';
 import { AIAssistantPage } from '@/pages/AIAssistantPage';
 import { FlashcardsPage } from '@/pages/FlashcardsPage';
 import { QuizzesPage } from '@/pages/QuizzesPage';
+import { SyllabusPage } from '@/pages/SyllabusPage';
 
 // Teacher Pages
 import { TeacherDashboard } from '@/pages/TeacherDashboard';
 import { TeacherUploadPaper } from '@/pages/TeacherUploadPaper';
+import { TeacherUploadNotes } from '@/pages/TeacherUploadNotes';
 
 // Shared Pages
 import { ProfilePage } from '@/pages/ProfilePage';
 import { SettingsPage } from '@/pages/SettingsPage';
+import { useThemeStore } from '@/store/useThemeStore';
 
 // Route Guard
 const ProtectedRoute: React.FC<{
@@ -49,10 +52,12 @@ const ProtectedRoute: React.FC<{
 
 export const App: React.FC = () => {
   const { checkAuth } = useAuthStore();
+  const { initTheme } = useThemeStore();
 
   useEffect(() => {
+    initTheme();
     checkAuth();
-  }, [checkAuth]);
+  }, [checkAuth, initTheme]);
 
   return (
     <BrowserRouter>
@@ -71,21 +76,128 @@ export const App: React.FC = () => {
           }
         >
           {/* Student Subroutes */}
-          <Route path="/student/dashboard" element={<StudentDashboard />} />
-          <Route path="/student/papers" element={<PaperVault />} />
-          <Route path="/student/papers/:id" element={<PaperStudyWorkspace />} />
-          <Route path="/student/study-intelligence" element={<StudyIntelligencePage />} />
-          <Route path="/student/notes" element={<NotesPage />} />
-          <Route path="/student/notes/:id" element={<NoteStudyWorkspace />} />
-          <Route path="/student/assistant" element={<AIAssistantPage />} />
-          <Route path="/student/flashcards" element={<FlashcardsPage />} />
-          <Route path="/student/quizzes" element={<QuizzesPage />} />
+          <Route
+            path="/student/dashboard"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/papers"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <PaperVault />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/papers/:id"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <PaperStudyWorkspace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/study-intelligence"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <StudyIntelligencePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/notes"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <NotesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/syllabus"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <SyllabusPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/notes/:id"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <NoteStudyWorkspace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/assistant"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <AIAssistantPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/flashcards"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <FlashcardsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/quizzes"
+            element={
+              <ProtectedRoute allowedRole="STUDENT">
+                <QuizzesPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Teacher Subroutes */}
-          <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-          <Route path="/teacher/papers" element={<PaperVault />} />
-          <Route path="/teacher/papers/:id" element={<PaperStudyWorkspace />} />
-          <Route path="/teacher/upload" element={<TeacherUploadPaper />} />
+          <Route
+            path="/teacher/dashboard"
+            element={
+              <ProtectedRoute allowedRole="TEACHER">
+                <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/papers"
+            element={
+              <ProtectedRoute allowedRole="TEACHER">
+                <PaperVault />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/papers/:id"
+            element={
+              <ProtectedRoute allowedRole="TEACHER">
+                <PaperStudyWorkspace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/upload"
+            element={
+              <ProtectedRoute allowedRole="TEACHER">
+                <TeacherUploadPaper />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/notes"
+            element={
+              <ProtectedRoute allowedRole="TEACHER">
+                <TeacherUploadNotes />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Shared Profile & Settings */}
           <Route path="/profile" element={<ProfilePage />} />

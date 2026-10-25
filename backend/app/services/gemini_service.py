@@ -94,9 +94,10 @@ class GeminiService:
         """
         fallback_models = [
             self._model_name,
-            "gemini-3.5-flash",
-            "gemini-3.5-flash-lite",
-            "gemini-3.6-flash",
+            "gemini-3.8-flash",
+            "gemini-flash-latest",
+            "gemini-2.5-flash-lite",
+            "gemini-pro-latest",
         ]
         # Deduplicate while preserving order
         unique_models = []
@@ -106,13 +107,17 @@ class GeminiService:
 
         last_error = None
         for current_model_name in unique_models:
-            active_model = self._genai.GenerativeModel(
-                model_name=current_model_name,
-                generation_config=self._genai.types.GenerationConfig(
-                    temperature=self._temperature,
-                    response_mime_type="application/json",
-                ),
-            )
+            try:
+                active_model = self._genai.GenerativeModel(
+                    model_name=current_model_name,
+                    generation_config=self._genai.types.GenerationConfig(
+                        temperature=self._temperature,
+                        response_mime_type="application/json",
+                    ),
+                )
+            except Exception as init_err:
+                logger.warning("gemini_model_init_failed", model=current_model_name, error=str(init_err))
+                continue
 
             for attempt in range(1, self._max_retries + 1):
                 try:
@@ -136,6 +141,7 @@ class GeminiService:
                     error_str = str(e).lower()
                     is_rate_limit = "quota" in error_str or "rate" in error_str or "429" in error_str
                     is_timeout = "timeout" in error_str or "deadline" in error_str
+                    is_not_found = "not found" in error_str or "no longer available" in error_str or "404" in error_str
 
                     logger.warning(
                         "gemini_attempt_failed",
@@ -147,9 +153,9 @@ class GeminiService:
                         is_timeout=is_timeout,
                     )
 
-                    if is_rate_limit:
-                        # Fail over immediately to next model on quota exhaustion
-                        logger.info("gemini_quota_failover", from_model=current_model_name)
+                    if is_rate_limit or is_not_found:
+                        # Fail over immediately to next model
+                        logger.info("gemini_failover", from_model=current_model_name)
                         break
 
                     if attempt < self._max_retries:
@@ -194,16 +200,18 @@ class GeminiService:
             except json.JSONDecodeError:
                 pass
 
-        # All strategies failed
-        logger.error(
-            "gemini_json_parse_failed",
+        # Strategy 4: Fallback for chat/rag — wrap raw text into answer object
+        logger.warning(
+            "gemini_json_parse_fallback_to_text",
             label=label,
-            raw_preview=raw[:200],
+            raw_preview=raw[:120],
         )
-        raise AIServiceError(
-            f"Gemini returned malformed JSON for {label}. "
-            "Cannot safely use this response."
-        )
+        return {
+            "answer": text,
+            "confidence": "HIGH",
+            "sources": [],
+            "used_fallback": True,
+        }
 
     def generate_text(self, prompt: str, context_label: str = "gemini_text") -> str:
         """

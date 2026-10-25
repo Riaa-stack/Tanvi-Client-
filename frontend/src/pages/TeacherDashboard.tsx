@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Plus,
   ArrowRight,
+  BookOpen,
 } from 'lucide-react';
 import { papersApi } from '@/services/api/papers';
 import { Paper } from '@/types';
@@ -77,13 +78,23 @@ export const TeacherDashboard: React.FC = () => {
             </p>
           </div>
 
-          <NavLink
-            to="/teacher/upload"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md font-sans shrink-0"
-          >
-            <Plus size={16} />
-            <span>Upload Question Paper</span>
-          </NavLink>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <NavLink
+              to="/teacher/notes"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md font-sans shrink-0"
+            >
+              <BookOpen size={16} />
+              <span>Upload Class Notes</span>
+            </NavLink>
+
+            <NavLink
+              to="/teacher/upload"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md font-sans shrink-0"
+            >
+              <Plus size={16} />
+              <span>Upload Question Paper</span>
+            </NavLink>
+          </div>
         </div>
 
         {/* 4 Summary Stats Cards */}

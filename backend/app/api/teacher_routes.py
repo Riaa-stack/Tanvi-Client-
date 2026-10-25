@@ -255,3 +255,111 @@ def dashboard():
             "recent_papers": [p.to_dict(include_internal=False) for p in recent_papers],
         }
     )
+
+
+# ── Teacher Notes (No OCR — Direct PDF / Word Course Notes) ─────────────────────
+
+@teacher_bp.route("/notes", methods=["POST"])
+@teacher_required
+def upload_teacher_note():
+    """
+    Upload a class note / study material (PDF or Word doc/docx).
+    No OCR or complex processing required. Available for students immediately.
+    """
+    teacher_id = get_jwt_identity()
+
+    if "file" not in request.files:
+        raise ValidationError("No file provided. Include 'file' in multipart form.")
+
+    file = request.files["file"]
+    if not file.filename:
+        raise ValidationError("File has no filename.")
+
+    title = (request.form.get("title") or "").strip()
+    if not title:
+        raise ValidationError("Note title is required.")
+
+    subject = (request.form.get("subject") or "").strip()
+    if not subject:
+        raise ValidationError("Subject name is required.")
+
+    semester = (request.form.get("semester") or "").strip()
+    if not semester:
+        raise ValidationError("Semester is required.")
+
+    branch = (request.form.get("branch") or "").strip()
+    description = (request.form.get("description") or "").strip()
+
+    # Validate file format and size
+    mime_type = _storage.validate_teacher_note_file(
+        file.stream, file.filename, request.content_length
+    )
+    file.stream.seek(0)
+
+    # Store file safely in storage/uploads/teacher_notes
+    stored_filename, file_path, file_size, checksum = _storage.store_teacher_note(
+        file.stream, file.filename
+    )
+
+    from app.repositories.teacher_note_repository import TeacherNoteRepository
+
+    note = TeacherNoteRepository.create(
+        teacher_id=teacher_id,
+        title=title,
+        subject_name=subject,
+        semester_name=semester,
+        branch_name=branch if branch else None,
+        description=description if description else None,
+        original_filename=file.filename,
+        stored_filename=stored_filename,
+        file_path=file_path,
+        file_size=file_size,
+        mime_type=mime_type,
+        checksum=checksum,
+    )
+
+    return created_response(
+        data=note.to_dict(),
+        message="Class note uploaded successfully and published to students.",
+    )
+
+
+@teacher_bp.route("/notes", methods=["GET"])
+@teacher_required
+def list_teacher_uploaded_notes():
+    """List all notes uploaded by this teacher."""
+    teacher_id = get_jwt_identity()
+    page, page_size = get_pagination_params(request.args)
+    from app.repositories.teacher_note_repository import TeacherNoteRepository
+
+    notes, total = TeacherNoteRepository.list_by_teacher(
+        teacher_id=teacher_id, page=page, page_size=page_size
+    )
+    return paginated_response(
+        items=[n.to_dict() for n in notes],
+        page=page,
+        page_size=page_size,
+        total=total,
+        data_key="notes",
+    )
+
+
+@teacher_bp.route("/notes/<note_id>", methods=["DELETE"])
+@teacher_required
+def delete_teacher_uploaded_note(note_id: str):
+    """Delete a teacher note."""
+    teacher_id = get_jwt_identity()
+    from app.repositories.teacher_note_repository import TeacherNoteRepository
+
+    note = TeacherNoteRepository.get_by_id_and_teacher(note_id, teacher_id)
+    if not note:
+        from app.errors import NotFoundError
+        raise NotFoundError(f"Teacher note with ID '{note_id}' not found.")
+
+    # Delete physical file
+    _storage.delete_teacher_note(note.stored_filename)
+
+    # Delete database record
+    TeacherNoteRepository.delete(note)
+    return success_response(message="Teacher note deleted successfully.")
+

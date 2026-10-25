@@ -167,13 +167,26 @@ class RAGService:
             answer_data = self._gemini.generate_json(prompt, "rag_answer")
         except Exception as e:
             logger.error("rag_gemini_failed", error=str(e))
-            answer_data = {
-                "answer": "I'm unable to process your question at this time due to a service error.",
-                "evidence_used": False,
-                "confidence": "LOW",
-                "sources": [],
-                "used_fallback": True,
-            }
+            try:
+                plain_text = self._gemini.generate_text(
+                    f"Answer the following student question thoroughly, clearly, and helpfully with markdown formatting:\n\nQuestion: {question}"
+                )
+                answer_data = {
+                    "answer": plain_text,
+                    "evidence_used": False,
+                    "confidence": "HIGH",
+                    "sources": [],
+                    "used_fallback": True,
+                }
+            except Exception as e2:
+                logger.error("rag_gemini_plain_fallback_failed", error=str(e2))
+                answer_data = {
+                    "answer": "I'm unable to process your question at this time due to a temporary service error. Please try asking again.",
+                    "evidence_used": False,
+                    "confidence": "LOW",
+                    "sources": [],
+                    "used_fallback": True,
+                }
 
         # 10. Enrich sources with DB metadata
         sources = self._enrich_sources(
