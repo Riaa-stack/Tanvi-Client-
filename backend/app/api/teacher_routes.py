@@ -169,9 +169,8 @@ def list_papers():
 @teacher_bp.route("/papers/<paper_id>", methods=["GET"])
 @teacher_required
 def get_paper(paper_id: str):
-    """Get details of a specific paper owned by this teacher."""
-    teacher_id = get_jwt_identity()
-    paper = PaperRepository.get_by_id_and_teacher(paper_id, teacher_id)
+    """Get details of a specific paper."""
+    paper = PaperRepository.get_by_id(paper_id)
     if not paper:
         raise PaperNotFoundError(paper_id)
     return success_response(data=paper.to_dict(include_internal=True))
@@ -181,8 +180,7 @@ def get_paper(paper_id: str):
 @teacher_required
 def get_paper_analysis(paper_id: str):
     """Get AI analysis for a paper."""
-    teacher_id = get_jwt_identity()
-    paper = PaperRepository.get_by_id_and_teacher(paper_id, teacher_id)
+    paper = PaperRepository.get_by_id(paper_id)
     if not paper:
         raise PaperNotFoundError(paper_id)
     analysis = PaperRepository.get_analysis(paper_id)
@@ -371,8 +369,7 @@ def get_paper_file(paper_id: str):
     import os
     from flask import send_file
 
-    teacher_id = get_jwt_identity()
-    paper = PaperRepository.get_by_id_and_teacher(paper_id, teacher_id)
+    paper = PaperRepository.get_by_id(paper_id)
     if not paper:
         raise PaperNotFoundError(paper_id)
     if not os.path.exists(paper.file_path):

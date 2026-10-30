@@ -103,16 +103,22 @@ print("Upload Response:", upload_res.status_code, upload_res.json())
 if upload_res.status_code == 201:
     paper_id = upload_res.json()["data"]["paper_id"]
 else:
+    # If paper is already in system (e.g., CONFLICT 422), fetch existing paper
     with app.app_context():
-        from app.models.paper import Paper
-        p = Paper.query.order_by(Paper.created_at.desc()).first()
+        import hashlib
+        from app.repositories.paper_repository import PaperRepository
+        with open(PDF_PATH, "rb") as pf:
+            chk = hashlib.sha256(pf.read()).hexdigest()
+        p = PaperRepository.get_by_checksum(chk)
+        if not p:
+            from app.models.paper import Paper
+            p = Paper.query.order_by(Paper.created_at.desc()).first()
         paper_id = p.id
 print("Target Paper ID:", paper_id)
 
 # 7. Polling Paper Processing Status
 print(f"\n[7] Waiting for AI Processing & Extraction for Paper {paper_id}...")
 for attempt in range(60):
-    time.sleep(3)
     status_res = requests.get(f"{BASE_URL}/student/papers/{paper_id}/status", headers=teacher_headers)
     s_info = status_res.json().get("data", {})
     status = s_info.get("status")
@@ -123,6 +129,7 @@ for attempt in range(60):
     elif status == "FAILED":
         print("  >>> Paper AI Processing Failed! Error:", s_info.get("error_message"))
         break
+    time.sleep(2)
 
 # 8. Check Extracted Questions & AI Insights
 print(f"\n[8] Inspecting Extracted Questions & AI Insights...")
@@ -134,14 +141,15 @@ for i, q in enumerate(questions[:3]):
     print(f"  Q{i+1}: [{q.get('difficulty')}] (Marks: {q.get('marks')}) Unit: {q.get('unit')} | Topic: {q.get('topic')}")
     print(f"      Text: {q.get('question_text', '')[:100]}...")
 
-# 9. Check Paper Analysis (Bloom's taxonomy, Unit distribution, etc.)
+# 9. Check Paper Analysis (Topics, Difficulty, Unit distribution, etc.)
 analysis_res = requests.get(f"{BASE_URL}/teacher/papers/{paper_id}/analysis", headers=teacher_headers).json()
 a_data = analysis_res.get("data", {})
 print("\n[9] AI Analysis Insights:")
-print("  - Summary:", (a_data.get("summary") or "")[:120])
-print("  - Bloom's Distribution:", a_data.get("blooms_distribution"))
-print("  - Difficulty Distribution:", a_data.get("difficulty_distribution"))
-print("  - Unit Distribution:", a_data.get("unit_distribution"))
+print("  - Topic Analysis Topics:", len(a_data.get("topic_analysis", {}).get("major_topics", [])))
+print("  - Difficulty Distribution:", a_data.get("difficulty_analysis", {}).get("distribution_percentage"))
+print("  - Unit Distribution:", list(a_data.get("unit_distribution", {}).keys()))
+print("  - Study Recommendations:", len(a_data.get("study_recommendations", [])))
+print("  - Potential Questions:", len(a_data.get("potential_questions", [])))
 
 # 10. Test Teacher File Serving
 print(f"\n[10] Testing Teacher PDF File Serving (/api/v1/teacher/papers/{paper_id}/file)...")

@@ -144,8 +144,12 @@ class PaperRepository:
 
     @staticmethod
     def get_by_checksum(checksum: str) -> Optional[Paper]:
-        stmt = select(Paper).where(Paper.checksum == checksum)
-        return db.session.execute(stmt).scalar_one_or_none()
+        stmt = (
+            select(Paper)
+            .where(Paper.checksum == checksum)
+            .order_by(Paper.created_at.desc())
+        )
+        return db.session.execute(stmt).scalars().first()
 
     @staticmethod
     def save(paper: Paper) -> Paper:
