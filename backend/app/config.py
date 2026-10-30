@@ -35,6 +35,8 @@ class Settings(BaseSettings):
 
     # ── Gemini ────────────────────────────────────────────────────────────────
     GEMINI_API_KEY: str
+    GEMINI_API_KEY_2: str = ""  # Optional fallback key
+    GEMINI_API_KEY_3: str = ""  # Optional fallback key
     GEMINI_MODEL: str = "gemini-1.5-flash"
     GEMINI_TEMPERATURE: float = 0.1
     GEMINI_TIMEOUT: int = 120
@@ -80,6 +82,16 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+    @property
+    def gemini_api_keys(self) -> List[str]:
+        """Return all configured non-empty Gemini API keys in priority order."""
+        keys = [self.GEMINI_API_KEY]
+        if self.GEMINI_API_KEY_2 and self.GEMINI_API_KEY_2.strip():
+            keys.append(self.GEMINI_API_KEY_2.strip())
+        if self.GEMINI_API_KEY_3 and self.GEMINI_API_KEY_3.strip():
+            keys.append(self.GEMINI_API_KEY_3.strip())
+        return keys
 
     @model_validator(mode="after")
     def _derive_debug(self) -> "Settings":

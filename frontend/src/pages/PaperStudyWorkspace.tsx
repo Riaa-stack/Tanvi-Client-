@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Sparkles,
   BookOpen,
@@ -29,9 +29,102 @@ import { StarDoodle, LightbulbDoodle } from '@/components/notebook/DoodleIcons';
 import { PencilLoader } from '@/components/notebook/PencilLoader';
 import { useStudyStore, IntelligenceTab } from '@/store/useStudyStore';
 
+const renderInlineBold = (str: string) => {
+  const parts = str.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, pIdx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={pIdx} className="font-bold text-slate-900 dark:text-slate-100">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
+const renderFormattedAnswer = (rawAnswer: any) => {
+  let text = typeof rawAnswer === 'string' ? rawAnswer.trim() : '';
+  if (typeof rawAnswer === 'object' && rawAnswer !== null) {
+    text = rawAnswer.answer || rawAnswer.text || JSON.stringify(rawAnswer, null, 2);
+  }
+  if (text.startsWith('{') && text.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed.answer) text = parsed.answer;
+      else if (parsed.response) text = parsed.response;
+    } catch {
+      // keep original
+    }
+  }
+
+  const lines = text.split('\n');
+  return (
+    <div className="space-y-2 text-xs leading-relaxed font-sans">
+      {lines.map((line, lIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={lIdx} className="h-1" />;
+
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4
+              key={lIdx}
+              className="font-bold text-sm text-slate-900 dark:text-white pt-2 pb-0.5 border-b border-stone-200/60 dark:border-slate-800"
+            >
+              {trimmed.replace(/^###\s+/, '')}
+            </h4>
+          );
+        }
+        if (trimmed.startsWith('## ')) {
+          return (
+            <h3
+              key={lIdx}
+              className="font-bold text-base text-slate-900 dark:text-white pt-2 pb-1 border-b border-stone-300 dark:border-slate-700"
+            >
+              {trimmed.replace(/^##\s+/, '')}
+            </h3>
+          );
+        }
+        if (trimmed.startsWith('# ')) {
+          return (
+            <h2 key={lIdx} className="font-bold text-lg text-slate-900 dark:text-white pt-2 pb-1">
+              {trimmed.replace(/^#\s+/, '')}
+            </h2>
+          );
+        }
+
+        if (
+          trimmed.startsWith('* ') ||
+          trimmed.startsWith('- ') ||
+          trimmed.startsWith('• ')
+        ) {
+          const content = trimmed.replace(/^[*•-]\s+/, '');
+          return (
+            <div key={lIdx} className="flex items-start gap-2 pl-2">
+              <span className="text-brand-500 font-bold shrink-0 mt-0.5">•</span>
+              <span className="text-slate-800 dark:text-slate-200">
+                {renderInlineBold(content)}
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <p key={lIdx} className="text-slate-800 dark:text-slate-200">
+            {renderInlineBold(line)}
+          </p>
+        );
+      })}
+    </div>
+  );
+};
+
 export const PaperStudyWorkspace: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Detect whether we are in the teacher area
+  const isTeacherView = location.pathname.startsWith('/teacher');
 
   const {
     activePaper,
@@ -59,9 +152,14 @@ export const PaperStudyWorkspace: React.FC = () => {
     const loadData = async () => {
       setIsLoading(true);
       try {
+        // Use teacher or student API based on the current route
         const [paperRes, analysisRes] = await Promise.all([
-          papersApi.getStudentPaper(id),
-          papersApi.getPaperAnalysis(id),
+          isTeacherView
+            ? papersApi.getTeacherPaper(id)
+            : papersApi.getStudentPaper(id),
+          isTeacherView
+            ? papersApi.getTeacherPaperAnalysis(id)
+            : papersApi.getPaperAnalysis(id),
         ]);
 
         if (paperRes.success && paperRes.data) {
@@ -78,7 +176,7 @@ export const PaperStudyWorkspace: React.FC = () => {
                 setHistorical(histRes.data.data);
               }
             } catch {
-              // Historical fallback
+              // Historical data optional — continue without it
             }
           }
         }
@@ -87,14 +185,14 @@ export const PaperStudyWorkspace: React.FC = () => {
           setAnalysis(analysisRes.data);
         }
       } catch (err) {
-        // Error handling
+        console.error('Failed to load paper data:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadData();
-  }, [id, setActivePaper]);
+  }, [id, isTeacherView, setActivePaper]);
 
   const handleAskAI = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,9 +216,42 @@ export const PaperStudyWorkspace: React.FC = () => {
 
       if (res.success && res.data) {
         setAiAnswers((prev) => [...prev, { question: q, response: res.data! }]);
+      } else {
+        // Show error response in the chat
+        setAiAnswers((prev) => [
+          ...prev,
+          {
+            question: q,
+            response: {
+              answer: 'Sorry, I could not get an answer at this moment. Please try again.',
+              evidence_level: 'NONE',
+              confidence: 'LOW',
+              sources: [],
+              related_questions: [],
+              related_papers: [],
+              used_fallback: true,
+            } as any,
+          },
+        ]);
       }
-    } catch {
-      // Handled
+    } catch (err: any) {
+      console.error('RAG query failed:', err);
+      // Show error in chat
+      setAiAnswers((prev) => [
+        ...prev,
+        {
+          question: q,
+          response: {
+            answer: `⚠️ AI service error: ${err?.response?.data?.error?.message || err?.message || 'Unknown error'}. Please try again.`,
+            evidence_level: 'NONE',
+            confidence: 'LOW',
+            sources: [],
+            related_questions: [],
+            related_papers: [],
+            used_fallback: true,
+          } as any,
+        },
+      ]);
     } finally {
       setIsAiLoading(false);
     }
@@ -167,6 +298,16 @@ export const PaperStudyWorkspace: React.FC = () => {
     paper?.questions?.reduce((sum, q) => sum + (q.marks || 0), 0) ||
     80;
 
+  const authToken = localStorage.getItem('eduarchive_access_token');
+  const fileEndpoint = id
+    ? isTeacherView
+      ? `/api/v1/teacher/papers/${id}/file`
+      : `/api/v1/student/papers/${id}/file`
+    : undefined;
+  const authenticatedPdfUrl = fileEndpoint
+    ? `${fileEndpoint}${authToken ? `?token=${encodeURIComponent(authToken)}` : ''}`
+    : undefined;
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[#ece5d8]">
       {/* Top Breadcrumb Bar with Badges */}
@@ -183,7 +324,7 @@ export const PaperStudyWorkspace: React.FC = () => {
           {/* Left Column: PDF Viewer */}
           <div className="lg:col-span-6 w-full sticky top-20">
             <PDFViewer
-              url={id ? `/api/v1/student/papers/${id}/file` : undefined}
+              url={authenticatedPdfUrl}
               title={paper?.original_filename || paper?.title || 'Question_Paper.pdf'}
               initialPage={1}
               className="h-[calc(100vh-140px)] min-h-[580px]"
@@ -737,7 +878,7 @@ export const PaperStudyWorkspace: React.FC = () => {
                                     <Sparkles size={14} /> AI Explanation:
                                   </div>
                                   <div className="text-xs leading-relaxed">
-                                    {item.response.answer}
+                                    {renderFormattedAnswer(item.response.answer)}
                                   </div>
 
                                   {item.response.sources?.length > 0 && (

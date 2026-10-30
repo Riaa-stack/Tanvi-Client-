@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useSearchParams } from 'react-router-dom';
+import { NavLink, useSearchParams, useLocation } from 'react-router-dom';
 import {
   FileText,
   Search,
@@ -18,6 +18,10 @@ import { Highlighter } from '@/components/notebook/Highlighter';
 
 export const PaperVault: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  // Determine if this is being viewed from the teacher area
+  const isTeacherView = location.pathname.startsWith('/teacher');
+  const paperBasePath = isTeacherView ? '/teacher/papers' : '/student/papers';
   const [papers, setPapers] = useState<Paper[]>([]);
   const [subjects, setSubjects] = useState<AcademicSubject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,9 +61,15 @@ export const PaperVault: React.FC = () => {
       if (selectedYear) params.year = parseInt(selectedYear);
       if (selectedSubject) params.subject_id = selectedSubject;
 
-      const res = await papersApi.getStudentPapers(params);
-      if (res.success && res.papers) {
-        let filtered = res.papers;
+      // Teachers see their own papers via teacher API; students use student API
+      const res = isTeacherView
+        ? await papersApi.getTeacherPapers(1, 50)
+        : await papersApi.getStudentPapers(params);
+
+      // Normalize: teacher API returns { papers: [...] }, student API returns { papers: [...] }
+      const paperList = res.papers || [];
+      if (paperList) {
+        let filtered: Paper[] = paperList;
         if (selectedSemester) {
           filtered = filtered.filter(
             (p: Paper) => p.semester?.number.toString() === selectedSemester
@@ -196,7 +206,7 @@ export const PaperVault: React.FC = () => {
             {papers.map((paper) => (
               <NavLink
                 key={paper.id}
-                to={`/student/papers/${paper.id}`}
+                to={`${paperBasePath}/${paper.id}`}
                 className="p-6 rounded-2xl bg-[#fdfbf7] notebook-ruled-bg border border-stone-200/90 shadow-paper hover:shadow-card-lift transition-all flex flex-col justify-between group"
               >
                 <div>

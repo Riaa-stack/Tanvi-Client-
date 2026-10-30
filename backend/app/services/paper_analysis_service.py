@@ -75,58 +75,121 @@ class PaperAnalysisService:
             questions_json=json.dumps(questions_data, indent=2),
         )
 
+        deterministic = self._deterministic_analysis(questions)
         try:
             analysis_data = gemini.generate_json(prompt, f"paper_analysis_{paper.id}")
+            if not isinstance(analysis_data, dict):
+                analysis_data = deterministic
         except Exception as e:
             logger.error("paper_analysis_gemini_failed", paper_id=paper.id, error=str(e))
-            # Fall back to deterministic analysis
-            analysis_data = self._deterministic_analysis(questions)
+            analysis_data = deterministic
 
-        # Build PaperAnalysis from Gemini response
-        analysis = PaperAnalysis(
-            paper_id=paper.id,
-            topic_analysis=analysis_data.get("topic_analysis"),
-            difficulty_analysis=analysis_data.get("difficulty_analysis")
-            or self._count_difficulties(questions),
-            mark_distribution=analysis_data.get("mark_distribution")
-            or self._count_marks(questions),
-            unit_distribution=analysis_data.get("unit_distribution")
-            or self._count_units(questions),
-            question_type_distribution=analysis_data.get("question_type_distribution")
-            or self._count_question_types(questions),
-            study_recommendations=analysis_data.get("study_recommendations"),
-            potential_questions=analysis_data.get("potential_questions"),
-            exam_trends=analysis_data.get("exam_trends"),
-            generated_at=datetime.now(timezone.utc),
-            model_name=settings.GEMINI_MODEL,
-            analysis_version="1.0",
-        )
+        # Merge with smart deterministic fallback for any missing or empty keys
+        topic_analysis = analysis_data.get("topic_analysis") or deterministic.get("topic_analysis")
+        difficulty_analysis = analysis_data.get("difficulty_analysis") or deterministic.get("difficulty_analysis")
+        mark_distribution = analysis_data.get("mark_distribution") or deterministic.get("mark_distribution")
+        unit_distribution = analysis_data.get("unit_distribution") or deterministic.get("unit_distribution")
+        question_type_distribution = analysis_data.get("question_type_distribution") or deterministic.get("question_type_distribution")
+        study_recommendations = analysis_data.get("study_recommendations") or deterministic.get("study_recommendations")
+        potential_questions = analysis_data.get("potential_questions") or deterministic.get("potential_questions")
+        exam_trends = analysis_data.get("exam_trends") or deterministic.get("exam_trends")
 
-        # Upsert: delete existing then insert
-        existing = db.session.get(PaperAnalysis, paper.id)
+        from sqlalchemy import select
+
+        # Upsert: find existing by paper_id (foreign key)
+        existing = db.session.execute(
+            select(PaperAnalysis).where(PaperAnalysis.paper_id == paper.id)
+        ).scalar_one_or_none()
+
         if existing:
-            db.session.delete(existing)
-            db.session.flush()
+            existing.topic_analysis = topic_analysis
+            existing.difficulty_analysis = difficulty_analysis
+            existing.mark_distribution = mark_distribution
+            existing.unit_distribution = unit_distribution
+            existing.question_type_distribution = question_type_distribution
+            existing.study_recommendations = study_recommendations
+            existing.potential_questions = potential_questions
+            existing.exam_trends = exam_trends
+            existing.generated_at = datetime.now(timezone.utc)
+            existing.model_name = settings.GEMINI_MODEL
+            analysis = existing
+        else:
+            analysis = PaperAnalysis(
+                paper_id=paper.id,
+                topic_analysis=topic_analysis,
+                difficulty_analysis=difficulty_analysis,
+                mark_distribution=mark_distribution,
+                unit_distribution=unit_distribution,
+                question_type_distribution=question_type_distribution,
+                study_recommendations=study_recommendations,
+                potential_questions=potential_questions,
+                exam_trends=exam_trends,
+                generated_at=datetime.now(timezone.utc),
+                model_name=settings.GEMINI_MODEL,
+                analysis_version="1.0",
+            )
+            db.session.add(analysis)
 
-        db.session.add(analysis)
         db.session.flush()
+        db.session.commit()
         logger.info("paper_analysis_saved", paper_id=paper.id)
         return analysis
 
     def _deterministic_analysis(self, questions: List[PaperQuestion]) -> dict:
-        """Fallback: compute basic statistics without Gemini."""
+        """Smart fallback: compute comprehensive statistics & recommendations directly from extracted questions."""
+        topics = self._aggregate_topics(questions)
+        units = self._count_units(questions)
+        marks = self._count_marks(questions)
+        difficulties = self._count_difficulties(questions)
+        q_types = self._count_question_types(questions)
+
+        # Smart predicted / potential questions from highest weight questions
+        potential_qs = []
+        sorted_qs = sorted(questions, key=lambda x: (x.marks or 0), reverse=True)
+        for q in sorted_qs[:4]:
+            potential_qs.append({
+                "question": q.question_text.strip()[:240],
+                "label": "High Probability",
+                "basis": f"High weightage ({int(q.marks or 10)} marks) covering {q.topic or q.unit or 'core syllabus'}",
+                "topic": q.topic or "Core Concept",
+                "estimated_marks": int(q.marks or 10),
+            })
+
+        # Smart study recommendations sorted by unit weight
+        sorted_units = sorted(units.items(), key=lambda kv: kv[1]["marks"], reverse=True)
+        study_recs = []
+        for p, (u_name, u_info) in enumerate(sorted_units[:3], 1):
+            study_recs.append({
+                "priority": p,
+                "topic": f"{u_name} ({int(u_info['marks'])} Marks)",
+                "reason": f"Heavily tested with {u_info['question_count']} questions in the exam.",
+                "suggested_time": f"{max(2, round(u_info['marks'] / 10))} hours",
+            })
+
+        top_unit_name = sorted_units[0][0] if sorted_units else "Unit 1"
+        top_unit_marks = sorted_units[0][1]["marks"] if sorted_units else 0
+
+        exam_trends = {
+            "overall_trend": f"Structured university exam paper with {len(questions)} questions across {len(units)} units totalling {marks['total_marks']} marks.",
+            "insights": [
+                f"{top_unit_name} carries the highest exam weightage ({top_unit_marks} marks).",
+                f"Paper balance: {difficulties['distribution_percentage']['medium']}% medium application and {difficulties['distribution_percentage']['hard']}% advanced analytical questions.",
+                f"Syllabus distribution focuses on core concepts across {len(topics)} major academic topics."
+            ]
+        }
+
         return {
             "topic_analysis": {
-                "major_topics": self._aggregate_topics(questions),
-                "topic_count": len({q.topic for q in questions if q.topic}),
+                "major_topics": topics,
+                "topic_count": len(topics),
             },
-            "difficulty_analysis": self._count_difficulties(questions),
-            "mark_distribution": self._count_marks(questions),
-            "unit_distribution": self._count_units(questions),
-            "question_type_distribution": self._count_question_types(questions),
-            "study_recommendations": [],
-            "potential_questions": [],
-            "exam_trends": None,
+            "difficulty_analysis": difficulties,
+            "mark_distribution": marks,
+            "unit_distribution": units,
+            "question_type_distribution": q_types,
+            "study_recommendations": study_recs,
+            "potential_questions": potential_qs,
+            "exam_trends": exam_trends,
         }
 
     def _aggregate_topics(self, questions: List[PaperQuestion]) -> list:

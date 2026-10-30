@@ -20,6 +20,7 @@ from app.config import get_settings
 from app.logging_config import get_logger
 from app.models.historical_analysis import EvidenceLevel
 from app.prompts.note_prompts import RAG_ANSWER_PROMPT
+from sqlalchemy import select
 
 logger = get_logger(__name__)
 
@@ -195,8 +196,20 @@ class RAGService:
             chunk_results,
         )
 
+        # Ensure answer is a clean formatted text string, not raw JSON
+        raw_ans = answer_data.get("answer", "")
+        if isinstance(raw_ans, dict):
+            raw_ans = raw_ans.get("answer") or raw_ans.get("text") or str(raw_ans)
+        elif isinstance(raw_ans, str) and raw_ans.strip().startswith("{") and raw_ans.strip().endswith("}"):
+            try:
+                parsed_ans = json.loads(raw_ans.strip())
+                if isinstance(parsed_ans, dict) and "answer" in parsed_ans:
+                    raw_ans = parsed_ans["answer"]
+            except Exception:
+                pass
+
         return {
-            "answer": answer_data.get("answer", ""),
+            "answer": raw_ans,
             "evidence_level": decision["evidence_level"],
             "confidence": answer_data.get("confidence", "LOW"),
             "sources": sources,

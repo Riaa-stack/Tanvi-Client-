@@ -167,6 +167,7 @@ class Paper(db.Model):
             "branch": self.branch.to_dict() if self.branch else None,
             "subject": self.subject.to_dict() if self.subject else None,
             "academic_scope_id": self.academic_scope_id,
+            "questions": [q.to_dict() for q in self.questions] if self.questions else [],
         }
         if include_internal:
             data.update(

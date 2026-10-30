@@ -213,7 +213,7 @@ export const TeacherUploadPaper: React.FC = () => {
             itemId={processingPaperId}
             onComplete={() => {
               setProcessingPaperId(null);
-              navigate(`/student/papers/${processingPaperId}`);
+              navigate(`/teacher/papers/${processingPaperId}`);
             }}
             onClose={() => {
               setProcessingPaperId(null);

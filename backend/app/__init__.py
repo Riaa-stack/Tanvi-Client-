@@ -57,7 +57,8 @@ def create_app(config_override: dict | None = None) -> Flask:
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
         days=settings.JWT_REFRESH_TOKEN_EXPIRES_DAYS
     )
-    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_TOKEN_LOCATION"] = ["headers", "query_string"]
+    app.config["JWT_QUERY_STRING_NAME"] = "token"
     app.config["JWT_HEADER_NAME"] = "Authorization"
     app.config["JWT_HEADER_TYPE"] = "Bearer"
     app.config["JWT_ERROR_MESSAGE_KEY"] = "message"

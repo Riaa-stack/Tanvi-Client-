@@ -363,3 +363,26 @@ def delete_teacher_uploaded_note(note_id: str):
     TeacherNoteRepository.delete(note)
     return success_response(message="Teacher note deleted successfully.")
 
+
+@teacher_bp.route("/papers/<paper_id>/file", methods=["GET"])
+@teacher_required
+def get_paper_file(paper_id: str):
+    """Serve the raw PDF file for a paper (teacher access)."""
+    import os
+    from flask import send_file
+
+    teacher_id = get_jwt_identity()
+    paper = PaperRepository.get_by_id_and_teacher(paper_id, teacher_id)
+    if not paper:
+        raise PaperNotFoundError(paper_id)
+    if not os.path.exists(paper.file_path):
+        from app.errors import NotFoundError
+        raise NotFoundError("Physical PDF file not found on server.")
+    return send_file(
+        paper.file_path,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=paper.original_filename,
+    )
+
+

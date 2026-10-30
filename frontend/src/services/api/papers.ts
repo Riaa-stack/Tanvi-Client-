@@ -17,6 +17,7 @@ export const papersApi = {
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 300000, // 5 minutes for large PDF uploads
       }
     );
     return res.data;

@@ -36,7 +36,49 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
   const [zoom, setZoom] = useState<number>(100);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!url) {
+      setBlobUrl(null);
+      setLoadError(null);
+      return;
+    }
+    let isMounted = true;
+    setIsLoading(true);
+    setLoadError(null);
+
+    const token = localStorage.getItem('eduarchive_access_token');
+    fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load document (${res.status})`);
+        }
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!isMounted) return;
+        const objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.warn('PDF blob load failed, trying query token fallback:', err);
+        if (!isMounted) return;
+        const separator = url.includes('?') ? '&' : '?';
+        const fallback = token ? `${url}${separator}token=${encodeURIComponent(token)}` : url;
+        setBlobUrl(fallback);
+        setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url]);
 
   useEffect(() => {
     if (propTotalPages) {
@@ -213,10 +255,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
             <div className="flex items-center justify-center h-full">
               <PencilLoader size="sm" message="Loading document..." />
             </div>
-          ) : url ? (
+          ) : (blobUrl || url) ? (
             <div className="w-full h-full min-h-[640px] flex flex-col bg-white rounded-sm overflow-hidden shadow-2xl">
               <iframe
-                src={`${url}#page=${currentPage}&zoom=${zoom}`}
+                src={`${blobUrl || url}#page=${currentPage}&zoom=${zoom}`}
                 className="w-full h-full min-h-[640px] border-0"
                 title={title}
               />
